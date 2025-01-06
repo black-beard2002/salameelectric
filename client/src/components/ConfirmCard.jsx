@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import PropTypes from 'prop-types';
 function Card2(props) {
   const [password, setPassword] = useState("");
 
@@ -33,7 +33,7 @@ function Card2(props) {
               Are you sure?
             </h2>
             <p className="text-sm text-gray-500 px-2">
-              Do you really want to delete '{props.target}'? This
+              Do you really want to delete &apos;{props.target}&apos;? This
               process cannot be undone
             </p>
           </div>
@@ -80,3 +80,9 @@ function Card2(props) {
 }
 
 export default Card2;
+
+Card2.propTypes = {
+  target: PropTypes.string.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};
