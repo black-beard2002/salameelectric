@@ -35,6 +35,6 @@ mongoose
   .then(() => {
     console.log("Connected to DB successfully");
     // Start the server
-    app.listen(5000, "localhost", () => console.log("Listening to port 5000"));
+    app.listen(5000,() => console.log("Listening to port 5000"));
   })
   .catch((err) => console.log(err));
