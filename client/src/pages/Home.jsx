@@ -25,19 +25,31 @@ const Home = () => {
   const navigate = useNavigate();
   const { fetchOffers, offers } = useOfferStore();
   const phoneNumber = "96103219099"; // Replace with the desired phone number
-  const message = "Hello, I want to inquire about..."; // Default message
-  const location = "https://maps.app.goo.gl/Q11gmmDWxdkkQtKx5"
+  const message = "salam"; // Default message
+  const location = "https://maps.app.goo.gl/Q11gmmDWxdkkQtKx5";
   const whatsAppLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
     message
   )}`;
   useEffect(() => {
     fetchCategories();
     fetchOffers();
-  }, [fetchCategories,fetchOffers]);
+  }, [fetchCategories, fetchOffers]);
 
-  const handleCatClick=(id)=>{
-    navigate(`/app/categories/${id}`)
-  }
+  const handleCatClick = (id) => {
+    navigate(`/app/categories/${id}`);
+  };
+  const isNewerThanTwoWeeks = (createdAt) => {
+    const currentDate = new Date();
+    const categoryDate = new Date(createdAt); // The string is in ISO format, which is compatible with Date
+    const timeDifference = currentDate - categoryDate; // Difference in milliseconds
+    const twoWeeksInMs = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
+    return timeDifference <= twoWeeksInMs;
+  };
+
+  const shouldDisplayCategory = (category) => {
+    // Check if at least one item in the category has a `createdAt` newer than 2 weeks
+    return category.items.some((item) => isNewerThanTwoWeeks(item.createdAt));
+  };
 
   return (
     <div className="flex flex-1 p-1 flex-col">
@@ -51,7 +63,7 @@ const Home = () => {
         </label>
       </div>
 
-      <ImageCarousel offers={offers}/>
+      <ImageCarousel offers={offers} />
 
       <div className="flex flex-col z-10 items-start p-5 flex-wrap mt-5">
         <label className="text-lg text-zinc-800 dark:text-white font-sans font-semibold">
@@ -59,11 +71,15 @@ const Home = () => {
           Shop By Category
         </label>
         <div className="w-full flex-row flex gap-2">
-          {categories.slice(0,3).map((category) => (
-            <CategoryCard key={category._id} category={category} onClick={()=>handleCatClick(category._id)}/>
+          {categories.slice(0, 3).map((category) => (
+            <CategoryCard
+              key={category._id}
+              category={category}
+              onClick={() => handleCatClick(category._id)}
+            />
           ))}
           <div className="w-1/4 aspect-square ">
-            <Loader2/>
+            <Loader2 onClick={()=>navigate("/app/categories")}/>
           </div>
         </div>
         <button
@@ -79,10 +95,14 @@ const Home = () => {
           <FontAwesomeIcon icon={faCartArrowDown} className="mr-1" />
           New Products
         </label>
+        <p className="text-sm font-mono spacing dark:text-slate-100 p-1">New products are available in the following categories!</p>
         <div className="w-full flex-wrap flex gap-2">
-          {categories.map((category) => (
-            <CategoryCard key={category._id} category={category} />
-          ))}
+          {categories.map(
+            (category) =>
+              shouldDisplayCategory(category) && (
+                <CategoryCard key={category._id} category={category} newFlag={true} onClick={() => handleCatClick(category._id)}/>
+              )
+          )}
         </div>
       </div>
 
@@ -106,8 +126,13 @@ const Home = () => {
                   icon={faLocationDot}
                   className="bg-red-700 rounded-full p-1 mx-1 text-white"
                 />
-                <a href={location} className="hover:underline text-black dark:text-slate-100 me-4 md:me-6">
-                  Lebanon,dahye,<br/>Rweiss, near Dahboul shop
+                <a
+                  href={location}
+                  className="hover:underline text-black dark:text-slate-100 me-4 md:me-6"
+                >
+                  Lebanon,dahye,
+                  <br />
+                  Rweiss, near Dahboul shop
                 </a>
               </li>
               <li className="flex items-center">
