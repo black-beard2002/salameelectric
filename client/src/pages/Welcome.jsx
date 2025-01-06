@@ -10,7 +10,7 @@ function Welcome() {
   const navigate = useNavigate();
   const [warning, setWarning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login, loginError, guestLogin } = useAuthStore();
+  const { login, loginError, guestLogin,clearError } = useAuthStore();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,8 +20,9 @@ function Welcome() {
     }
     setIsLoading(true);
     setWarning(false);
-    const result = await login({ username: username, password: password });
+    await login({ username: username, password: password });
     setIsLoading(false);
+    clearError();
     navigate("/app");
   };
 
@@ -36,8 +37,9 @@ function Welcome() {
   };
 
   const handleGuest = () => {
-    const result = guestLogin();
+    guestLogin();
     navigate("/app");
+    clearError();
   };
 
   return (
