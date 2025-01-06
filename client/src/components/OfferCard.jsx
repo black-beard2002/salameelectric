@@ -3,9 +3,10 @@ import { useAuthStore } from "../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import PropTypes from 'prop-types';
 function OfferCard({ offer, onDelete }) {
   const phoneNumber = "96103219099"; // Replace with the desired phone number
-  const message = `Hello, I want to inquire about ${offer.title}`; // Default message
+  const message = `Hello, I want to inquire about ${offer.title} offer`; // Default message
   const whatsAppLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
     message
   )}`;
@@ -73,3 +74,14 @@ function OfferCard({ offer, onDelete }) {
 }
 
 export default OfferCard;
+OfferCard.propTypes = {
+  offer: PropTypes.shape({
+    _id: PropTypes.number.isRequired,
+    image: PropTypes.bool.isRequired,
+    price: PropTypes.number.isRequired,
+    defaultPrice: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+  }).isRequired,
+  onDelete: PropTypes.func.isRequired,
+};
