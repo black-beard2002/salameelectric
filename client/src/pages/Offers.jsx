@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useOfferStore } from "../store/offer";
 import { useAuthStore } from "../store/auth";
 import OfferCard from "../components/OfferCard";
+import Loader from "../components/Loader";
 import reduceImageSize from "../utils/imageReducer";
 import { useCategoryStore } from "../store/category";
 import CustomAlert from "../components/CustomAlert";
@@ -21,6 +22,7 @@ function Offers() {
   const { categories } = useCategoryStore();
   const [alert, setAlert] = useState(false);
   const [color, setColor] = useState("");
+  const [isLoading,setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [fullItems, setFullItems] = useState([]);
   // Form states
@@ -157,6 +159,7 @@ function Offers() {
         }, 3000);
         return;
       }
+      setIsLoading(true);
       const offer = {
         title: title,
         description: description,
@@ -173,6 +176,7 @@ function Offers() {
         setTimeout(() => {
           setAlert(false);
         }, 3000);
+        setIsLoading(false);
         return;
       }
       setColor("red-500");
@@ -183,6 +187,7 @@ function Offers() {
       }, 3000);
       setOfferItems([]);
       setFullItems([]);
+      setIsLoading(false);
       setTotalPrice(0);
       setTitle("");
       setDescription("");
@@ -384,7 +389,7 @@ function Offers() {
                   type="submit"
                   className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
                 >
-                  Create Offer
+                  {isLoading?<Loader/>:'Create Offer'}
                 </button>
               </form>
             </div>
