@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCalendar,
+  faCalendarCheck,
   faImage,
   faPenToSquare,
-    faCalendar,
-  faCalendarCheck,
   faPlusCircle,
   faSearch,
   faT,
@@ -12,8 +12,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { useCategoryStore } from "../store/category";
-import Loader from "../components/Loader";
 import reduceImageSize from "../utils/imageReducer";
+import Loader from "../components/Loader";
 import CustomAlert from "../components/CustomAlert";
 import { useAuthStore } from "../store/auth";
 import Card2 from "../components/ConfirmCard";
@@ -25,9 +25,9 @@ function Categories() {
   const [state, setState] = useState(0); // 0 means new category, 1 means updating category
   const [selectedCategory, setSelectedCategory] = useState({});
   const [color, setColor] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [newCategory, setNewCategory] = useState({
     name: "",
     items: [],
@@ -57,6 +57,7 @@ function Categories() {
     if (newCategory.name.trim() !== "") {
       setIsLoading(true);
       if (state === 0) {
+        // Make a copy to avoid modifying the original newCategory
         const categoryWithoutTimestamps = { ...newCategory };
         delete categoryWithoutTimestamps.createdAt;
         delete categoryWithoutTimestamps.updatedAt;
@@ -64,7 +65,6 @@ function Categories() {
       } else {
         result = await updateCategory(selectedCategory._id, newCategory);
       }
-      console.log(result);
 
       if (result.success) {
         setAlert(true);
@@ -197,7 +197,7 @@ function Categories() {
                 value={newCategory.name}
                 minLength={1}
                 required
-                maxLength={20}
+                maxLength={35}
                 onChange={(e) =>
                   setNewCategory({ ...newCategory, name: e.target.value })
                 }
@@ -245,13 +245,13 @@ function Categories() {
                 onClick={() => setIsEditing(false)}
                 className="bg-gray-300 w-20 hover:bg-gray-400 text-gray-700 rounded px-4 py-2"
               >
-                Cancel
+                cancel
               </button>
               <button
                 type="submit"
-                className="bg-[#FFD700] w-20 hover:bg-[#d7bb1c] text-white rounded px-4 py-2"
+                className="bg-[#FFD700] hover:bg-[#d7bb1c] w-20 text-white rounded px-4 py-2"
               >
-                {isLoading?<Loader/>:'submit'}
+                {isLoading ? <Loader /> : "submit"}
               </button>
             </div>
           </form>
