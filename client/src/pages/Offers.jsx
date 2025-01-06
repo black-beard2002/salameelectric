@@ -251,7 +251,7 @@ function Offers() {
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       />
                       <div className="border-blue-600 text-zinc-900 truncate font-medium dark:text-slate-200 px-[10px] py-[11px] text-xs dark:bg-[#323440] bg-slate-100 border-2 rounded-[5px] w-full">
-                        {image ? image.name : "Choose an image..."}
+                        {image ? "image uploaded" : "Choose an image..."}
                       </div>
                     </div>
                   </div>
