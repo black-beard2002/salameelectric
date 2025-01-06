@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 const CustomAlert=(props)=> {
     return (
       <div
@@ -22,3 +23,8 @@ const CustomAlert=(props)=> {
   }
   
   export default CustomAlert;
+
+  CustomAlert.propTypes = {
+    message: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+  };
