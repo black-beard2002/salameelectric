@@ -22,11 +22,11 @@ function OfferCard({ offer, onDelete }) {
         <img
           src={offer.image || logo}
           alt="Offer Image"
-          className="h-full w-full max-w-full max-h-full object-cover"
+          className="h-full w-full max-w-full max-h-full object-fit"
         />
       </div>
       <div className="p-6">
-        <h5 className="mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased">
+        <h5 className="mb-2 block break-words font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased">
           {offer.title}
         </h5>
         <p className="block font-sans text-base break-words font-light leading-relaxed text-inherit antialiased">
@@ -76,8 +76,8 @@ function OfferCard({ offer, onDelete }) {
 export default OfferCard;
 OfferCard.propTypes = {
   offer: PropTypes.shape({
-    _id: PropTypes.number.isRequired,
-    image: PropTypes.bool.isRequired,
+    _id: PropTypes.string.isRequired,
+    image: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     defaultPrice: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
