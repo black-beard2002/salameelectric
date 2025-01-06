@@ -8,7 +8,7 @@ const RootLayout = () => {
           <SideNav/>
         </div>
   
-        <div className="flex flex-1 px-1 dark:bg-[#2e3440] bg-[#ececec] pt-24 sm:px-1 md:px-4 lg:px-8 overflow-auto">
+        <div className="flex flex-1 px-1 max-w-screen dark:bg-[#2e3440] bg-[#ececec] pt-24 sm:px-1 md:px-4 lg:px-8 overflow-auto">
           <Outlet />
         </div>
       </div>
