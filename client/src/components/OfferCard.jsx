@@ -5,7 +5,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 function OfferCard({ offer, onDelete }) {
   const phoneNumber = "96103219099"; // Replace with the desired phone number
-  const message = `Hello, I want to inquire about ${offer.name}`; // Default message
+  const message = `Hello, I want to inquire about ${offer.title}`; // Default message
   const whatsAppLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
     message
   )}`;
