@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* styles.css */
+:root {
+  @apply bg-white text-black; /* Light mode styles */
+}
+
+.dark :root {
+  @apply bg-gray-900 text-white; /* Dark mode styles */
+}
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
