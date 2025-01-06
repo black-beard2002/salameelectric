@@ -29,7 +29,7 @@ function CategoryComponentCard({ item, onUpdate, onDelete }) {
 
   return (
     <div className="relative flex flex-col gap-1 bg-gray-300 dark:bg-gray-600 rounded-lg p-2 mb-2">
-      {isNewerThanTwoWeeks(item.updatedAt) && (
+      {isNewerThanTwoWeeks(item.updatedAt) && item.availability && (
         <div className="absolute top-0 rounded-b-lg left-1/2 transform -translate-x-1/2 bg-green-300/90 text-white px-3 py-1 text-sm font-medium">
           new
         </div>
