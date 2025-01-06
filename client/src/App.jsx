@@ -23,10 +23,17 @@ const ProtectedRoute = () => {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />; 
+  return <Outlet />;
 };
 
 function App() {
+  const { checkSession } = useAuthStore();
+
+  // Check session on app load
+  useEffect(() => {
+    checkSession();
+  }, [checkSession]);
+
   return (
     <BrowserRouter>
       <Routes>
