@@ -55,7 +55,10 @@ function Categories() {
     if (newCategory.name.trim() !== "") {
       setIsLoading(true);
       if (state === 0) {
-        result = await createCategory(newCategory);
+        const categoryWithoutTimestamps = { ...newCategory };
+        delete categoryWithoutTimestamps.createdAt;
+        delete categoryWithoutTimestamps.updatedAt;
+        result = await createCategory(categoryWithoutTimestamps);
       } else {
         result = await updateCategory(selectedCategory._id, newCategory);
       }
@@ -124,6 +127,8 @@ function Categories() {
       name: category.name,
       items: category.items,
       image: category.image,
+      createdAt: category.createdAt,
+      updatedAt: category.updatedAt,
     });
     setIsEditing(true);
   };
