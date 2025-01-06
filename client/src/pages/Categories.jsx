@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { useCategoryStore } from "../store/category";
+import Loader from "../components/Loader";
 import reduceImageSize from "../utils/imageReducer";
 import CustomAlert from "../components/CustomAlert";
 import { useAuthStore } from "../store/auth";
@@ -22,6 +23,7 @@ function Categories() {
   const [state, setState] = useState(0); // 0 means new category, 1 means updating category
   const [selectedCategory, setSelectedCategory] = useState({});
   const [color, setColor] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [message, setMessage] = useState("");
   const [newCategory, setNewCategory] = useState({
@@ -51,6 +53,7 @@ function Categories() {
     e.preventDefault();
     let result = { success: false, message: "" };
     if (newCategory.name.trim() !== "") {
+      setIsLoading(true);
       if (state === 0) {
         result = await createCategory(newCategory);
       } else {
@@ -75,6 +78,7 @@ function Categories() {
           setAlert(false);
         }, 2000);
       }
+      setIsLoading(false);
       setIsEditing(false);
       return;
     }
@@ -214,15 +218,15 @@ function Categories() {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setIsEditing(false)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-700 rounded px-4 py-2"
+                className="bg-gray-300 w-20 hover:bg-gray-400 text-gray-700 rounded px-4 py-2"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-[#FFD700] hover:bg-[#d7bb1c] text-white rounded px-4 py-2"
+                className="bg-[#FFD700] w-20 hover:bg-[#d7bb1c] text-white rounded px-4 py-2"
               >
-                Submit
+                {isLoading?<Loader/>:'submit'}
               </button>
             </div>
           </form>
