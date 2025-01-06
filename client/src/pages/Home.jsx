@@ -65,12 +65,12 @@ const Home = () => {
 
       <ImageCarousel offers={offers} />
 
-      <div className="flex flex-col z-10 items-start p-5 flex-wrap mt-5">
+      <div className="flex flex-col z-10 items-start p-2 flex-wrap mt-5">
         <label className="text-lg text-zinc-800 dark:text-white font-sans font-semibold">
           <FontAwesomeIcon icon={faTableCellsLarge} className="mr-1" />
           Shop By Category
         </label>
-        <div className="w-full flex-row flex gap-2">
+        <div className="w-full flex-row flex gap-1">
           {categories.slice(0, 3).map((category) => (
             <CategoryCard
               key={category._id}
@@ -78,7 +78,7 @@ const Home = () => {
               onClick={() => handleCatClick(category._id)}
             />
           ))}
-          <div className="w-1/4 aspect-square ">
+          <div className="w-[22%]  aspect-square ">
             <Loader2 onClick={()=>navigate("/app/categories")}/>
           </div>
         </div>
@@ -90,7 +90,7 @@ const Home = () => {
           <FontAwesomeIcon icon={faTableCellsLarge} />
         </button>
       </div>
-      <div className="flex flex-col z-10 items-start p-5 flex-wrap">
+      <div className="flex flex-col z-10 items-start p-2 flex-wrap">
         <label className="text-lg text-zinc-800 dark:text-white font-sans font-semibold">
           <FontAwesomeIcon icon={faCartArrowDown} className="mr-1" />
           New Products
@@ -167,9 +167,9 @@ const Home = () => {
                   icon={faPhone}
                   className="mx-1 text-white bg-gray-600 p-1 rounded-full"
                 />
-                <a href={whatsAppLink} className="hover:underline me-4 md:me-6">
+                <span className="me-4 md:me-6">
                   01542185
-                </a>
+                </span>
               </li>
             </ul>
           </div>
