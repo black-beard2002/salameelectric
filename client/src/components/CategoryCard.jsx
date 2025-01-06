@@ -1,11 +1,21 @@
-import React from 'react';
 
-const CategoryCard = ({ category, onClick }) => {
+import PropTypes from 'prop-types';
+
+const CategoryCard = ({ 
+  category, 
+  onClick, 
+  newFlag = false // Using default parameter instead of defaultProps
+}) => {
   return (
     <div 
       onClick={onClick}
       className="relative w-1/4 aspect-square bg-white dark:bg-zinc-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group border border-gray-100 dark:border-zinc-700"
     >
+      {newFlag && (
+        <div className="absolute top-0 rounded-tr-xl rounded-bl-xl right-0 bg-green-500 text-white px-3 py-1 text-xs font-medium z-10">
+          new
+        </div>
+      )}
       <div className="p-2 h-full min-h-fit flex flex-col items-center justify-center space-y-2">
         <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
           {category.image ? (
@@ -34,6 +44,15 @@ const CategoryCard = ({ category, onClick }) => {
       </div>
     </div>
   );
+};
+
+CategoryCard.propTypes = {
+  category: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    image: PropTypes.string
+  }).isRequired,
+  onClick: PropTypes.func.isRequired,
+  newFlag: PropTypes.bool
 };
 
 export default CategoryCard;
