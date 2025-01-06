@@ -1,8 +1,11 @@
 import { useParams } from "react-router-dom";
 import CategoryComponentCard from "../components/CategoryComponentCard";
+import Loader from "../components/Loader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faA,
+  faCalendar,
+  faCalendarCheck,
   faD,
   faDollarSign,
   faPlusCircle,
@@ -20,6 +23,7 @@ function Category() {
   const [item, setItem] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState({});
   const [state, setState] = useState(0); // 0 means new category, 1 means updating category
   const [alert, setAlert] = useState(false);
@@ -46,6 +50,7 @@ function Category() {
   const handleNewItem = async (e) => {
     e.preventDefault();
     if (newItem.name.trim() !== "" && newItem.price > 0) {
+      setIsLoading(true);
       let result = { success: false, message: "" };
       if (state === 0) {
         const newCategory = {
@@ -56,10 +61,17 @@ function Category() {
       } else {
         const updatedCategory = {
           ...category,
-          items: category.items.map((item) =>
-            item._id === selectedItem._id ? { ...item, ...newItem } : item
-          ),
+          items: category.items.map((item) => {
+            if (item._id === selectedItem._id) {
+              const cleanedNewItem = { ...newItem };
+              delete cleanedNewItem.createdAt;
+              delete cleanedNewItem.updatedAt;
+              return { ...item, ...cleanedNewItem };
+            }
+            return item;
+          }),
         };
+
         result = await updateCategory(id, updatedCategory);
       }
 
@@ -81,6 +93,7 @@ function Category() {
           setAlert(false);
         }, 2000);
       }
+      setIsLoading(false);
       setIsEditing(false);
       setNewItem({ name: "", price: 0, description: "", availability: true });
       return;
@@ -100,6 +113,8 @@ function Category() {
       description: item.description,
       price: item.price,
       availability: item.availability,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
     });
     setIsEditing(true);
   };
@@ -202,17 +217,24 @@ function Category() {
                 <p className="text-sm ml-3 text-gray-500">availability</p>
               </div>
 
-              <div className="inline-flex justify-center rounded-md mt-1 shadow-sm w-full" role="group">
+              <div
+                className="inline-flex justify-center rounded-md mt-1 shadow-sm w-full"
+                role="group"
+              >
                 <button
                   type="button"
-                  onClick={()=>{setNewItem({...newItem,availability:true})}}
+                  onClick={() => {
+                    setNewItem({ ...newItem, availability: true });
+                  }}
                   className="px-2 py-1 w-1/2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
                 >
                   available
                 </button>
                 <button
                   type="button"
-                  onClick={()=>{setNewItem({...newItem,availability:false})}}
+                  onClick={() => {
+                    setNewItem({ ...newItem, availability: false });
+                  }}
                   className="px-2 py-1 text-sm w-1/2 font-medium text-gray-900 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
                 >
                   unavailable
@@ -237,18 +259,36 @@ function Category() {
                 placeholder="price $"
               />
             </div>
+            {state === 1 && (
+              <div className="flex flex-col gap-1 mt-3">
+                <div className="bg-slate-300 flex flex-col text-gray-950 w-full font-light rounded-xl p-2 dark:bg-gray-600">
+                  <span className="dark:text-gray-400 text-gray-950">
+                    <FontAwesomeIcon icon={faCalendar} className="mr-1" />
+                    created at:
+                  </span>{" "}
+                  {newItem.createdAt}
+                </div>
+                <div className="bg-slate-300 flex flex-col text-gray-950 w-full font-light rounded-xl p-2 dark:bg-gray-600">
+                  <span className="dark:text-gray-400 text-gray-950">
+                    <FontAwesomeIcon icon={faCalendarCheck} className="mr-1" />
+                    last updated at:
+                  </span>{" "}
+                  {newItem.updatedAt}
+                </div>
+              </div>
+            )}
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setIsEditing(false)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-700 rounded px-4 py-2"
+                className="bg-gray-300 w-20 hover:bg-gray-400 text-gray-700 rounded px-4 py-2"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-[#FFD700] hover:bg-[#d7bb1c] text-white rounded px-4 py-2"
+                className="bg-[#FFD700] hover:bg-[#d7bb1c] w-20 text-white rounded px-4 py-2"
               >
-                Submit
+                {isLoading ? <Loader /> : "submit"}
               </button>
             </div>
           </form>
@@ -302,7 +342,7 @@ function Category() {
           <div>
             <button
               type="button"
-              onClick={() => setIsEditing(true)}
+              onClick={() => {setIsEditing(true);setState(0);}}
               className="bg-[#FFD700] items-center gap-1 text-white inline-flex p-2 rounded-xl mb-5"
             >
               <FontAwesomeIcon icon={faPlusCircle} />
