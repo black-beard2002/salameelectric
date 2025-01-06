@@ -30,7 +30,7 @@ app.get("*", (req, res) => {
 // MongoDB Connection
 mongoose
   .connect(
-    "mongodb+srv://ahmadsalemehas02:db9GTn3X2PpBVNya@cluster0.netsr.mongodb.net/salame_electric?retryWrites=true&w=majority&appName=Cluster0"
+    process.env.MONGODB_URI
   )
   .then(() => {
     console.log("Connected to DB successfully");
