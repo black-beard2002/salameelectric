@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGift } from "@fortawesome/free-solid-svg-icons";
-import {useNavigate} from "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const ImageCarousel = ({ offers = [] }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [direction, setDirection] = useState("next");
   const [slides, setSlides] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
-    // Initialize slides when offers change
-    const images = offers.map((offer) => offer.image);
-    setSlides(images);
+    setSlides(offers);
   }, [offers]);
 
   useEffect(() => {
@@ -43,8 +43,13 @@ const ImageCarousel = ({ offers = [] }) => {
   if (!slides.length) {
     return (
       <div className="relative w-full flex-col flex items-center justify-center bg-gray-100 py-5 dark:bg-gray-800">
-        <FontAwesomeIcon icon={faGift} className="w-7 h-7 text-gray-700 dark:text-gray-300"/>
-        <p className="text-gray-500 dark:text-gray-300">No Offers available at the moment</p>
+        <FontAwesomeIcon
+          icon={faGift}
+          className="w-7 h-7 text-gray-700 dark:text-gray-300"
+        />
+        <p className="text-gray-500 dark:text-gray-300">
+          No Offers available at the moment
+        </p>
       </div>
     );
   }
@@ -52,7 +57,7 @@ const ImageCarousel = ({ offers = [] }) => {
   return (
     <div className="relative w-11/12 sm:w-11/12 md:w-2/3 lg:w-2/3 mx-auto">
       <div className="relative h-56 overflow-hidden rounded-lg lg:h-96">
-        {slides.map((slide, index) => (
+        {slides.map((offer, index) => (
           <div
             key={index}
             className={`absolute w-full h-full flex justify-center transition-all duration-700 ease-in-out ${
@@ -67,12 +72,38 @@ const ImageCarousel = ({ offers = [] }) => {
                 : "opacity-0 translate-x-full"
             }`}
           >
-            <img
-              src={slide}
-              onClick={()=>{navigate("/app/offers")}}
-              className="absolute block cursor-pointer hover:scale-110 duration-300 max-w-full max-h-full w-full h-full object-cover"
-              alt={`Slide ${index + 1}`}
-            />
+            <div className="relative w-full h-full">
+              <img
+                src={offer.image}
+                onClick={() => {
+                  navigate("/app/offers");
+                }}
+                className="absolute block cursor-pointer hover:scale-105 duration-200 max-w-full max-h-full w-full h-full object-cover"
+                alt={offer.name}
+              />
+              {/* Overlay container */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                <div className="flex flex-col space-y-1">
+                  <h3 className="text-white font-semibold text-lg md:text-xl lg:text-2xl">
+                    {offer.title}
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-2">
+                      <span className="text-white font-bold line-through text-base md:text-lg lg:text-xl">
+                        ${offer.defaultPrice}
+                      </span>
+                      <span className="text-white font-bold text-base md:text-lg lg:text-xl">
+                        ${offer.price}
+                      </span>
+                    </div>
+
+                    <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
+                      View Offer!
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -140,6 +171,16 @@ const ImageCarousel = ({ offers = [] }) => {
       </button>
     </div>
   );
+};
+
+ImageCarousel.propTypes = {
+  offers: PropTypes.arrayOf(
+    PropTypes.shape({
+      image: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      price: PropTypes.number.isRequired,
+    })
+  ).isRequired,
 };
 
 export default ImageCarousel;
