@@ -10,7 +10,7 @@ export const useCategoryStore = create((set) => ({
     if (!newCategory.name || !newCategory.items) {
       return { success: false, message: "Please fill in all fields." };
     }
-    const res = await fetch("http://localhost:5000/api/app/create", {
+    const res = await fetch("https://salameelectric.onrender.com/api/app/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,13 +26,13 @@ export const useCategoryStore = create((set) => ({
     return { success: true, message: "Category created successfully" };
   },
   fetchCategories: async () => {
-    const res = await fetch("http://localhost:5000/api/app");
+    const res = await fetch("https://salameelectric.onrender.com/api/app");
     const data = await res.json(); // data={success:"",data}
     set({ categories: data.data });
     localStorage.setItem("categories", JSON.stringify(data.data)); // Save to localStorage
   },
   deleteCategory: async (cid) => {
-    const res = await fetch(`http://localhost:5000/api/app/${cid}`, {
+    const res = await fetch(`https://salameelectric.onrender.com/api/app/${cid}`, {
       method: "DELETE",
     });
     const data = await res.json();
@@ -49,7 +49,7 @@ export const useCategoryStore = create((set) => ({
     return { success: true, message: data.message };
   },
   updateCategory: async (cid, updatedCategory) => {
-    const res = await fetch(`http://localhost:5000/api/app/${cid}`, {
+    const res = await fetch(`https://salameelectric.onrender.com/api/app/${cid}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
