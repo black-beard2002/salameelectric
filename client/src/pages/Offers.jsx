@@ -306,7 +306,7 @@ function Offers() {
                     >
                       <option value="">Select an item</option>
                       {categories.map((category) =>
-                        category.items.map((item) => (
+                        category.items.filter((item)=>item.availability).map((item) => (
                           <option key={item._id} value={item._id}>
                             {item.name} - ${item.price}
                           </option>
