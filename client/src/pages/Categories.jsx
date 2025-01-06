@@ -215,6 +215,24 @@ function Categories() {
                 className="flex h-10 w-full rounded-md border border-input bg-white px-3 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-gray-600 file:text-sm file:font-medium"
               />
             </div>
+            {state === 1 && (
+              <div className="flex flex-col gap-1 mt-3">
+                <div className="bg-slate-300 flex flex-col text-gray-950 w-full font-light rounded-xl p-2 dark:bg-gray-600">
+                  <span className="dark:text-gray-400 text-gray-950">
+                    <FontAwesomeIcon icon={faCalendar} className="mr-1" />
+                    created at:
+                  </span>{" "}
+                  {newCategory.createdAt}
+                </div>
+                <div className="bg-slate-300 flex flex-col text-gray-950 w-full font-light rounded-xl p-2 dark:bg-gray-600">
+                  <span className="dark:text-gray-400 text-gray-950">
+                    <FontAwesomeIcon icon={faCalendarCheck} className="mr-1" />
+                    last updated at:
+                  </span>{" "}
+                  {newCategory.updatedAt}
+                </div>
+              </div>
+            )}
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setIsEditing(false)}
