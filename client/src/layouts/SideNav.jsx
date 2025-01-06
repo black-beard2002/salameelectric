@@ -6,23 +6,20 @@ import {
   faBarsStaggered,
   faBoltLightning,
   faHome,
-  faSortDown,
   faTableCellsLarge,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/logo.svg";
 import { useAuthStore } from "../store/auth";
 import { faReadme, faSalesforce } from "@fortawesome/free-brands-svg-icons";
-import { faSun } from "@fortawesome/free-solid-svg-icons/faSun";
+
 function SideNav() {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuthStore();
   const location = "https://maps.app.goo.gl/Q11gmmDWxdkkQtKx5";
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -181,7 +178,7 @@ function SideNav() {
       >
         <div className="h-full px-3 pb-4 overflow-y-auto bg-[#dcdcdd]  font-sans dark:bg-gray-800 dark:text-slate-50">
           <ul className="space-y-2 font-bold ">
-            <li>
+            <li onClick={()=>setIsSidebarOpen(false)}>
               <Link
                 to="/app"
                 className="flex items-center rounded-lg w-full p-2  hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200 group"
@@ -195,7 +192,7 @@ function SideNav() {
                 </span>
               </Link>
             </li>
-            <li>
+            <li onClick={()=>setIsSidebarOpen(false)}>
               <Link
                 to="/app/categories"
                 className="flex items-center rounded-lg w-full p-2  hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200 group"
@@ -209,7 +206,7 @@ function SideNav() {
                 </span>
               </Link>
             </li>
-            <li>
+            <li onClick={()=>setIsSidebarOpen(false)}>
               <Link
                 to="/app/offers"
                 className="flex items-center rounded-lg w-full p-2  hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200 group"
@@ -223,7 +220,7 @@ function SideNav() {
                 </span>
               </Link>
             </li>
-            <li>
+            <li onClick={()=>setIsSidebarOpen(false)}>
               <Link
                 to="/app/about"
                 className="flex items-center rounded-lg w-full p-2  hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200 group"
@@ -237,40 +234,6 @@ function SideNav() {
                 </span>
               </Link>
             </li>
-            {isSidebarOpen && (
-              <>
-                <li
-                  onClick={toggleDropdown}
-                  aria-controls="dropdown-example"
-                  className="flex flex-row items-center  rounded-lg cursor-pointer justify-between hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-200"
-                  data-collapse-toggle="dropdown-example"
-                >
-                  <div className="flex flex-row items-center">
-                    <FontAwesomeIcon
-                      icon={faSun}
-                      className="w-6 pl-2 dark:text-gray-200 text-[#1985a1] h-6"
-                    />
-                    <a className="flex items-center py-2  dark:text-gray-300  group">
-                      <span className="flex-1 ms-3 dark:text-gray-200 text-[#46494c] whitespace-nowrap">
-                        Toggle Theme
-                      </span>
-                    </a>
-                  </div>
-                  <FontAwesomeIcon
-                    icon={faSortDown}
-                    className="w-3 dark:text-gray-200 text-[#1985a1] h-3"
-                  />
-                </li>
-                <li
-                  id="dropdown-example"
-                  className={`${
-                    isDropdownOpen ? "" : "hidden"
-                  } py-2 space-y-2 pl-10`}
-                >
-                  <ThemeToggle />
-                </li>
-              </>
-            )}
           </ul>
         </div>
       </aside>
