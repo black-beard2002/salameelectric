@@ -417,6 +417,7 @@ function Offers() {
           </div>
         )}
         <div className="flex w-full flex-wrap justify-center gap-x-5">
+          {offers.length===0 && (<p className="mx-auto text-gray-600 mt-5">No offers available at the moment</p>)}
           {offers.map((offer) => (
             <OfferCard key={offer._id} offer={offer} onDelete={handleOfferDelete}/>
           ))}
