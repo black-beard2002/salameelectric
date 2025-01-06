@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useOfferStore } from "../store/offer";
 import { useAuthStore } from "../store/auth";
 import OfferCard from "../components/OfferCard";
-import Loader from "../components/Loader";
 import reduceImageSize from "../utils/imageReducer";
 import { useCategoryStore } from "../store/category";
 import CustomAlert from "../components/CustomAlert";
@@ -15,6 +14,7 @@ import {
   faPlus,
   faSackDollar,
 } from "@fortawesome/free-solid-svg-icons";
+import Loader from "../components/Loader";
 
 function Offers() {
   const { offers, fetchOffers, createOffer, deleteOffer } = useOfferStore();
@@ -22,9 +22,9 @@ function Offers() {
   const { categories } = useCategoryStore();
   const [alert, setAlert] = useState(false);
   const [color, setColor] = useState("");
-  const [isLoading,setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [fullItems, setFullItems] = useState([]);
+  const [isLoading,setIsLoading] = useState(false);
   // Form states
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
@@ -32,11 +32,12 @@ function Offers() {
   // Changed structure to store item with quantity
   const [offerItems, setOfferItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [newPrice, setNewPrice] = useState();
+  const [newPrice, setNewPrice] = useState(0);
 
   useEffect(() => {
     fetchOffers();
   }, [fetchOffers]);
+
 
   const findItemInCategories = (itemName) => {
     for (const category of categories) {
@@ -177,14 +178,15 @@ function Offers() {
           setAlert(false);
         }, 3000);
         setIsLoading(false);
-        return;
       }
+      else{
       setColor("red-500");
       setMessage("Failed to create offer");
       setAlert(true);
       setTimeout(() => {
         setAlert(false);
       }, 3000);
+      
       setOfferItems([]);
       setFullItems([]);
       setIsLoading(false);
@@ -193,7 +195,7 @@ function Offers() {
       setDescription("");
       setImage(null);
       setNewPrice(0);
-    };
+    };}
 
     return (
       <div className="flex flex-col flex-1 p-1">
@@ -272,7 +274,7 @@ function Offers() {
                     <input
                       id="price"
                       type="number"
-                      value={newPrice}
+                      value={newPrice || 0}
                       onChange={(e) => setNewPrice(Number(e.target.value))}
                       className="border-blue-600 text-zinc-900 font-medium dark:text-slate-200 input px-[10px] py-[11px] text-xs dark:bg-[#323440] bg-slate-100 border-2 rounded-[5px] w-full focus:outline-none"
                     />
@@ -407,7 +409,7 @@ function Offers() {
                 />
               </p>
               <p className="text-sm mb-4 text-white">
-                We're thrilled to have you here! Whether you're a professional
+                We&apos;re thrilled to have you here! Whether you&apos;re a professional
                 electrician, an engineer, or an enthusiast, our platform is
                 designed to provide you with top-notch electronic components at
                 unbeatable prices. Check out our exclusive offers and elevate
@@ -417,7 +419,7 @@ function Offers() {
           </div>
         )}
         <div className="flex w-full flex-wrap justify-center gap-x-5">
-          {offers.length===0 && (<p className="mx-auto text-gray-600 mt-5">No offers available at the moment</p>)}
+          {offers.length===0 && (<p className="text-gray-600 mt-5">No offers available at the moment!</p>)}
           {offers.map((offer) => (
             <OfferCard key={offer._id} offer={offer} onDelete={handleOfferDelete}/>
           ))}
