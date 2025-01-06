@@ -55,7 +55,7 @@ const ImageCarousel = ({ offers = [] }) => {
   }
 
   return (
-    <div className="relative w-11/12 sm:w-11/12 md:w-2/3 lg:w-2/3 mx-auto">
+    <div className="relative w-3/4 md:w-2/3 lg:w-2/3 mx-auto">
       <div className="relative h-56 overflow-hidden rounded-lg lg:h-96">
         {slides.map((offer, index) => (
           <div
@@ -79,12 +79,12 @@ const ImageCarousel = ({ offers = [] }) => {
                   navigate("/app/offers");
                 }}
                 className="absolute block cursor-pointer hover:scale-105 duration-200 max-w-full max-h-full w-full h-full object-cover"
-                alt={offer.name}
+                alt={offer.title}
               />
               {/* Overlay container */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
                 <div className="flex flex-col space-y-1">
-                  <h3 className="text-white font-semibold text-lg md:text-xl lg:text-2xl">
+                  <h3 className="text-white truncate font-semibold text-lg md:text-xl lg:text-2xl">
                     {offer.title}
                   </h3>
                   <div className="flex items-center justify-between">
@@ -179,6 +179,7 @@ ImageCarousel.propTypes = {
       image: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       price: PropTypes.number.isRequired,
+      defaultPrice: PropTypes.number.isRequired,
     })
   ).isRequired,
 };
