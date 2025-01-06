@@ -150,7 +150,7 @@ function Category() {
         />
       )}
       {isEditing && (
-        <div className="fixed inset-0 flex items-center z-10 justify-center bg-black bg-opacity-60">
+        <div className="fixed inset-0 flex items-center z-50 justify-center bg-black bg-opacity-60">
           <form
             onSubmit={handleNewItem}
             className="dark:bg-gray-700 bg-slate-100 flex flex-col gap-2 rounded-lg p-6 w-96"
@@ -259,7 +259,7 @@ function Category() {
           <img
             src={category.image}
             alt={category.name}
-            className="aspect-square mb-5 mx-auto max-h-72  rounded-lg"
+            className="aspect-square sm:aspect-square md:aspect-video lg:aspect-video md:h-80 lg:h-96 mb-5 mx-auto max-h-80 h-80 rounded-lg"
           />
         ) : (
           <div className="w-full flex items-center justify-center mb-5 mx-auto lg:w-1/2 h-72 rounded-lg">
