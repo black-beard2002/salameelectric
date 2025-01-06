@@ -200,7 +200,7 @@ function Category() {
                 type="text"
                 value={newItem.description}
                 minLength={1}
-                maxLength={60}
+                maxLength={200}
                 onChange={(e) =>
                   setNewItem({ ...newItem, description: e.target.value })
                 }
@@ -299,7 +299,7 @@ function Category() {
           <img
             src={category.image}
             alt={category.name}
-            className="aspect-square sm:aspect-square md:aspect-video lg:aspect-video md:h-80 lg:h-96 mb-5 mx-auto max-h-80 h-80 rounded-lg"
+            className="max-w-full h-64 md:aspect-video lg:aspect-video md:h-80 lg:h-96 mb-5 mx-auto max-h-80  rounded-lg"
           />
         ) : (
           <div className="w-full flex items-center justify-center mb-5 mx-auto lg:w-1/2 h-72 rounded-lg">
