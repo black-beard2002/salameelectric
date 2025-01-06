@@ -3,20 +3,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 import PropTypes from 'prop-types';
+
 function CategoryComponentCard({ item, onUpdate, onDelete }) {
-  const phoneNumber = "96103219099"; // Replace with the desired phone number
-  const message = `Hello, I want to inquire about ${item.name} with the following specs: ${item.description}`; // Default message
-  const whatsAppLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-    message
-  )}`;
+  const phoneNumber = "96103219099";
+  const message = `Hello, I want to inquire about ${item.name} with the following specs: ${item.description}`;
+  const whatsAppLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   const { isAuthenticated, user } = useAuthStore();
   let isNew = false;
+  
   const isNewerThanTwoWeeks = (updatedAt) => {
-    
     const currentDate = new Date();
     const itemDate = new Date(updatedAt);
     
-    // First check if the date is in the future
     if (itemDate > currentDate) {
       return false;
     }
@@ -34,24 +32,22 @@ function CategoryComponentCard({ item, onUpdate, onDelete }) {
           new
         </div>
       )}
-      <div
-        className={`w-full ${isNew && 'mt-3'} items-center justify-between flex`}
-      >
-        <div className="flex flex-col ">
-          <p
-            className={`font-sans ${
-              !item.availability ? "line-through" : ""
-            } text-zinc-800 dark:text-slate-50 font-bold text-lg`}
-          >
+      <div className={`w-full ${isNew ? 'mt-3' : ''} flex items-start gap-2`}>
+        <div className="flex-1 min-w-0">
+          <p className={`font-sans ${!item.availability ? "line-through" : ""} text-zinc-800 dark:text-slate-50 font-bold text-lg`}>
             {item.name}
           </p>
-          <p className="font-sans text-zinc-800 dark:text-slate-50 break-words text-md ml-2">
-            {item.description}
+          <div className="max-w-[calc(100%-4rem)] ml-2">
+            <p className="font-sans text-zinc-800 dark:text-slate-50 text-md whitespace-normal break-all">
+              {item.description}
+            </p>
+          </div>
+        </div>
+        <div className="flex-shrink-0">
+          <p className="bg-green-500 w-16 text-center p-1 rounded-2xl">
+            {item.price}$
           </p>
         </div>
-        <p className="bg-green-500 w-16 text-center p-1 rounded-2xl">
-          {item.price}$
-        </p>
       </div>
       <div className="w-full mt-2 flex justify-between flex-row items-center">
         {item.availability ? (
@@ -68,7 +64,7 @@ function CategoryComponentCard({ item, onUpdate, onDelete }) {
           </span>
         )}
         {isAuthenticated && user.username !== "guest" && (
-          <div className="w-full mt-2 flex gap-2 justify-end items-center">
+          <div className="flex gap-2 items-center">
             <FontAwesomeIcon
               icon={faPenToSquare}
               onClick={onUpdate}
