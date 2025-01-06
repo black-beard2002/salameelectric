@@ -168,7 +168,7 @@ function Categories() {
       )}
       {alert && <CustomAlert message={message} color={color} />}
       {isEditing && (
-        <div className="fixed inset-0 flex items-center z-10 justify-center bg-black bg-opacity-60">
+        <div className="fixed inset-0 flex items-center z-50 justify-center bg-black bg-opacity-60">
           <form
             onSubmit={handleNewCategory}
             className="dark:bg-gray-700 bg-slate-100 flex flex-col gap-2 rounded-lg p-6 w-96"
