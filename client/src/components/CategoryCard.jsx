@@ -17,7 +17,7 @@ const CategoryCard = ({
         </div>
       )}
       <div className="p-2 h-full min-h-fit flex flex-col items-center justify-center space-y-2">
-        <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+        <div className="relative w-full flex items-center justify-center aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
           {category.image ? (
             <img
               src={category.image}
