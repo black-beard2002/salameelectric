@@ -55,7 +55,7 @@ const ImageCarousel = ({ offers = [] }) => {
   }
 
   return (
-    <div className="relative w-3/4 md:w-2/3 lg:w-2/3 mx-auto">
+    <div className="relative w-11/12 md:w-2/3 lg:w-2/3 mx-auto">
       <div className="relative h-56 overflow-hidden rounded-lg lg:h-96">
         {slides.map((offer, index) => (
           <div
