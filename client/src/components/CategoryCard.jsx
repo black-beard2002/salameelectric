@@ -22,7 +22,7 @@ const CategoryCard = ({
             <img
               src={category.image}
               alt={category.name}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              className="w-full object-fit object-cover transition-transform duration-300 group-hover:scale-110"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
