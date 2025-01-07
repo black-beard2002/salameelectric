@@ -35,6 +35,6 @@ mongoose
   .then(() => {
     console.log("Connected to DB successfully");
     // Start the server
-    app.listen(process.env.PORT,() => console.log("Listening to port "+process.env.PORT));
+    app.listen(process.env.PORT,() => console.log("Listening to port "+process.env.PORT+" on "+process.env.HOST_URL));
   })
   .catch((err) => console.log(err));
