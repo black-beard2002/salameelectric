@@ -78,7 +78,7 @@ const ImageCarousel = ({ offers = [] }) => {
                 onClick={() => {
                   navigate("/app/offers");
                 }}
-                className="absolute block cursor-pointer hover:scale-105 duration-200 max-w-full max-h-full w-full h-full object-cover"
+                className="absolute block cursor-pointer hover:scale-105 duration-200 max-w-full max-h-full w-full h-full aspect-square object-fit"
                 alt={offer.title}
               />
               {/* Overlay container */}
