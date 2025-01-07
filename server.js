@@ -1,4 +1,4 @@
-import express from "express";
+Eimport express from "express";
 import mongoose from "mongoose";
 import path from "path";
 import cors from "cors";
@@ -35,6 +35,6 @@ mongoose
   .then(() => {
     console.log("Connected to DB successfully");
     // Start the server
-    app.listen(process.env.PORT,() => console.log("Listening to port "+process.env.PORT+" on "+process.env.HOST_URL));
+    app.listen(process.env.PORT,() => console.log("Listening to port "+process.env.PORT+" on "+process.env.RENDERHOST_URL));
   })
   .catch((err) => console.log(err));
