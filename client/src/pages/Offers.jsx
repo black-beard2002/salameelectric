@@ -67,25 +67,28 @@ function Offers() {
       };
     });
   };
-  const handleFileUpload = async (e) => {
-    setImageInputText("uploading image..");
-    try {
-      const file = e.target.files[0];
-      if (!file) return;
-      const base64 = await convertToBase64(file);
-      const reducedImage = await reduceImageSize(base64);
-      setImage(reducedImage);
-      setImageInputText("image uploaded!");
-    } catch (error) {
-      console.error("Error processing image:", error);
-      setAlert(true);
-      setColor("red-500");
-      setMessage("Error processing image. Please try a different image.");
-      setTimeout(() => {
-        setAlert(false);
-      }, 2000);
-    }
-  };
+const handleFileUpload = async (e) => {
+  setImageInputText("uploading image..");
+  try {
+    const file = e.target.files[0];
+    if (!file) return;
+    // Check file size in KB
+    const fileSizeInKB = file.size / 1024;
+    const base64 = await convertToBase64(file);
+    // Reduce image size only if the file size is greater than 60 KB
+    const reducedImage = fileSizeInKB > 60 ? await reduceImageSize(base64) : base64;
+    setImage(reducedImage);
+    setImageInputText("image uploaded!");
+  } catch (error) {
+    console.error("Error processing image:", error);
+    setAlert(true);
+    setColor("red-500");
+    setMessage("Error processing image. Please try a different image.");
+    setTimeout(() => {
+      setAlert(false);
+    }, 2000);
+  }
+};
 
   const handleItemSelect = (e) => {
     const selectedItem = categories
