@@ -20,7 +20,7 @@ export const useAuthStore = create(
         }
 
         try {
-          const response = await fetch(`${process.env.HOST_URL}/api/login`, {
+          const response = await fetch(`${import.meta.env.VITE_HOST_URL}/api/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
