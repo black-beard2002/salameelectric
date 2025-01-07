@@ -12,7 +12,7 @@ export const useOfferStore = create((set) => ({
       return { success: false, message: "Please fill in all fields." };
     }
     
-    const res = await fetch(process.env.HOST_URL+"/api/app/offers/create", {
+    const res = await fetch(`${import.meta.env.VITE_RENDERHOST_URL}/api/app/offers/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,7 +29,7 @@ export const useOfferStore = create((set) => ({
     return { success: true, message: "offer created successfully" };
   },
   fetchOffers: async () => {
-    const res = await fetch(process.env.HOST_URL+"/api/app/offers",{
+    const res = await fetch(`${import.meta.env.VITE_RENDERHOST_URL}/api/app/offers`,{
       // mode: 'no-cors',
     });
     const data = await res.json(); // data={success:"",data}
@@ -37,7 +37,7 @@ export const useOfferStore = create((set) => ({
     localStorage.setItem("offers", JSON.stringify(data.data)); // Save to localStorage
   },
   deleteOffer: async (id) => {
-    const res = await fetch(`${process.env.HOST_URL}/api/app/offers/${id}`, {
+    const res = await fetch(`${import.meta.env.VITE_RENDERHOST_URL}/api/app/offers/${id}`, {
       method: "DELETE",
       // mode: 'no-cors',
     });
