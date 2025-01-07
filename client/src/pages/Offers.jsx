@@ -67,16 +67,15 @@ function Offers() {
       };
     });
   };
-
-I  const handleFileUpload = async (e) => {
-    setImageInputText("uploading image..")
+  const handleFileUpload = async (e) => {
+    setImageInputText("uploading image..");
     try {
       const file = e.target.files[0];
       if (!file) return;
       const base64 = await convertToBase64(file);
       const reducedImage = await reduceImageSize(base64);
       setImage(reducedImage);
-      setImageInputText("image uploaded!")
+      setImageInputText("image uploaded!");
     } catch (error) {
       console.error("Error processing image:", error);
       setAlert(true);
