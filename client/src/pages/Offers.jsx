@@ -23,6 +23,7 @@ function Offers() {
   const [alert, setAlert] = useState(false);
   const [color, setColor] = useState("");
   const [message, setMessage] = useState("");
+  const [imageInputText,setImageInputText]=useState("upload image");
   const [fullItems, setFullItems] = useState([]);
   const [isLoading,setIsLoading] = useState(false);
   // Form states
@@ -67,13 +68,15 @@ function Offers() {
     });
   };
 
-  const handleFileUpload = async (e) => {
+I  const handleFileUpload = async (e) => {
+    setImageInputText("uploading image..")
     try {
       const file = e.target.files[0];
       if (!file) return;
       const base64 = await convertToBase64(file);
       const reducedImage = await reduceImageSize(base64);
       setImage(reducedImage);
+      setImageInputText("image uploaded!")
     } catch (error) {
       console.error("Error processing image:", error);
       setAlert(true);
@@ -258,7 +261,7 @@ function Offers() {
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       />
                       <div className="border-blue-600 text-zinc-900 truncate font-medium dark:text-slate-200 px-[10px] py-[11px] text-xs dark:bg-[#323440] bg-slate-100 border-2 rounded-[5px] w-full">
-                        {image ? "image uploaded" : "Choose an image..."}
+                        {imageInputText}
                       </div>
                     </div>
                   </div>
