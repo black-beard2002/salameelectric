@@ -12,6 +12,8 @@ export const useAuthStore = create(
 
       // Method to handle user login
       login: async ({ username, password }) => {
+        console.log("HOST_URL:", process.env.HOST_URL);
+
         if (!username || !password) {
           set({ loginError: "Username and password are required." });
           return { success: false, message: "Please provide valid credentials." };
