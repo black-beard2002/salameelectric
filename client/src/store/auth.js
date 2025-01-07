@@ -12,15 +12,14 @@ export const useAuthStore = create(
 
       // Method to handle user login
       login: async ({ username, password }) => {
-        console.log("HOST_URL:", process.env.HOST_URL);
-
+        console.log(import.meta.env.VITE_RENDERHOST_URL)
         if (!username || !password) {
           set({ loginError: "Username and password are required." });
           return { success: false, message: "Please provide valid credentials." };
         }
 
         try {
-          const response = await fetch(`${import.meta.env.VITE_HOST_URL}/api/login`, {
+          const response = await fetch(`${import.meta.env.VITE_RENDERHOST_URL}/api/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
