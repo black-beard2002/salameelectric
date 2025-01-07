@@ -60,6 +60,7 @@ export const useAuthStore = create(
       // Method to handle user logout
       logout: () => {
         set({ user: null, isAuthenticated: false, loginError: null, lastLogin: null });
+        localStorage.setItem("categories", {}); // Save to localStorage
       },
 
       // Method to check if the session has expired
