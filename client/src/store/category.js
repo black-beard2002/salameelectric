@@ -32,7 +32,7 @@ export const useCategoryStore = create((set) => ({
     localStorage.setItem("categories", JSON.stringify(data.data)); // Save to localStorage
   },
   deleteCategory: async (cid) => {
-    const res = await fetch(`https://salameelectric.onrender.com/api/app/${cid}`, {
+    const res = await fetch(`${process.env.HOST_URL}/api/app/${cid}`, {
       method: "DELETE",
     });
     const data = await res.json();
@@ -49,7 +49,7 @@ export const useCategoryStore = create((set) => ({
     return { success: true, message: data.message };
   },
   updateCategory: async (cid, updatedCategory) => {
-    const res = await fetch(`https://salameelectric.onrender.com/api/app/${cid}`, {
+    const res = await fetch(`${process.env.HOST_URL}/api/app/${cid}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
