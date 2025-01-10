@@ -1,74 +1,128 @@
 import { create } from "zustand";
+import axios from "axios";
 
-export const useCategoryStore = create((set) => ({
-  categories: JSON.parse(localStorage.getItem("categories")) || [], // Load categories from localStorage or use an empty array
+const API_BASE_URL = "http://localhost:4000/api/app";
+const CACHE_KEY = "categories";
+
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+});
+
+export const useCategoryStore = create((set, get) => ({
+  categories: [],
+  isLoading: false,
+  lastSynced: null, // Track last server sync time
+
   setCategories: (categories) => {
-    set({ categories });
-    localStorage.setItem("categories", JSON.stringify(categories)); // Save to localStorage
+    const timestamp = Date.now();
+    set({ categories, lastSynced: timestamp });
+    // Store both categories and the sync timestamp
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({
+        data: categories,
+        timestamp,
+      })
+    );
   },
+
+  fetchCategories: async () => {
+    const state = get();
+    if (state.isLoading)
+      return { success: false, message: "Fetch already in progress" };
+
+    try {
+      set({ isLoading: true });
+
+      // Always fetch fresh data from server first
+      const { data } = await axiosInstance.get("/");
+
+      get().setCategories(data.data);
+      set({ isLoading: false });
+      return { success: true };
+    } catch (error) {
+      // If server fetch fails, try to use cached data
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { data } = JSON.parse(cached);
+        if (Array.isArray(data)) {
+          set({ categories: data, isLoading: false });
+          return { success: true, fromCache: true };
+        }
+      }
+
+      set({ isLoading: false });
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to fetch categories",
+      };
+    }
+  },
+
   createCategory: async (newCategory) => {
-    if (!newCategory.name || !newCategory.items) {
+    if (!newCategory.get("name")) {
       return { success: false, message: "Please fill in all fields." };
     }
-    const res = await fetch(`${import.meta.env.VITE_RENDERHOST_URL}/api/app/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newCategory),
-    });
-    const data = await res.json();
-    set((state) => {
-      const newCategories = [...state.categories, data.data];
-      localStorage.setItem("categories", JSON.stringify(newCategories)); // Save to localStorage
-      return { categories: newCategories };
-    });
-    return { success: true, message: "Category created successfully" };
+
+    try {
+      const { data } = await axiosInstance.post("/create", newCategory);
+      set((state) => ({
+        categories: [...state.categories, data.data],
+        lastSynced: Date.now(),
+      }));
+      return { success: true, message: "Category created successfully" };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to create category",
+      };
+    }
   },
-  fetchCategories: async () => {
-    const res = await fetch(`${import.meta.env.VITE_RENDERHOST_URL}/api/app`);
-    const data = await res.json(); // data={success:"",data}
-    set({ categories: data.data });
-    localStorage.setItem("categories", JSON.stringify(data.data)); // Save to localStorage
-  },
+
   deleteCategory: async (cid) => {
-    const res = await fetch(`${import.meta.env.VITE_RENDERHOST_URL}/api/app/${cid}`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
-    if (!data.success) return { success: false, message: data.message };
+    try {
+      const { data } = await axiosInstance.delete(`/${cid}`);
+      if (!data.success) return { success: false, message: data.message };
 
-    // update the UI immediately, without needing a refresh
-    set((state) => {
-      const updatedCategories = state.categories.filter(
-        (category) => category._id !== cid
-      );
-      localStorage.setItem("categories", JSON.stringify(updatedCategories)); // Save to localStorage
-      return { categories: updatedCategories };
-    });
-    return { success: true, message: data.message };
+      set((state) => ({
+        categories: state.categories.filter((category) => category._id !== cid),
+        lastSynced: Date.now(),
+      }));
+      return { success: true, message: data.message };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to delete category",
+      };
+    }
   },
-  updateCategory: async (cid, updatedCategory) => {
-    const res = await fetch(`${import.meta.env.VITE_RENDERHOST_URL}/api/app/${cid}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedCategory),
-      
-    });
-    const data = await res.json();
-    if (!data.success) return { success: false, message: data.message };
 
-    // update the UI immediately, without needing a refresh
-    set((state) => {
-      const updatedCategories = state.categories.map((category) =>
-        category._id === cid ? data.data : category
+  updateCategory: async (cid, updatedCategoryParts) => {
+    try {
+      const { data } = await axiosInstance.patch(
+        `/${cid}`,
+        updatedCategoryParts
       );
-      localStorage.setItem("categories", JSON.stringify(updatedCategories)); // Save to localStorage
-      return { categories: updatedCategories };
-    });
+      if (!data.success) return { success: false, message: data.message };
 
-    return { success: true, message: data.message };
+      set((state) => ({
+        categories: state.categories.map((category) =>
+          category._id === cid ? data.data : category
+        ),
+        lastSynced: Date.now(),
+      }));
+      return { success: true, message: "Category updated successfully" };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to update category",
+      };
+    }
+  },
+
+  clearCache: () => {
+    set({ categories: [], lastSynced: null });
+    localStorage.removeItem(CACHE_KEY);
   },
 }));
