@@ -21,7 +21,7 @@ import {
   faWhatsapp,
 } from "@fortawesome/free-brands-svg-icons";
 const Home = () => {
-  const { fetchCategories, categories } = useCategoryStore();
+  const { fetchCategories, categories, isLoaded } = useCategoryStore();
   const navigate = useNavigate();
   const { fetchOffers, offers } = useOfferStore();
   const phoneNumber = "96103219099"; // Replace with the desired phone number
@@ -30,10 +30,13 @@ const Home = () => {
   const whatsAppLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
     message
   )}`;
+
   useEffect(() => {
-    fetchCategories();
-    fetchOffers();
-  }, [fetchCategories, fetchOffers]);
+    if (!isLoaded) {
+      fetchCategories();
+      fetchOffers();
+    }
+  }, [isLoaded, fetchCategories, fetchOffers]);
 
   const handleCatClick = (id) => {
     navigate(`/app/categories/${id}`);
@@ -47,8 +50,8 @@ const Home = () => {
   };
 
   const shouldDisplayCategory = (category) => {
-    // Check if at least one item in the category has a `createdAt` newer than 2 weeks
-    return category.items.some((item) => isNewerThanTwoWeeks(item.createdAt));
+    // Check if category and items exist and at least one item is newer than 2 weeks
+    return category?.items?.some((item) => isNewerThanTwoWeeks(item.createdAt));
   };
 
   return (
@@ -56,9 +59,9 @@ const Home = () => {
       <div className="flex z-10 flex-row gap-2 mb-10 items-center">
         <FontAwesomeIcon
           icon={faShop}
-          className="w-8 h-8 text-[#FFD700] dark:text-[#ffffff]"
+          className="w-6 y-6 xs:w-8  text-[#FFD700] dark:text-[#ffffff]"
         />
-        <label className="text-2xl dark:text-white text-zinc-800 font-semibold font-sans">
+        <label className="text-xl xs:text-2xl dark:text-white text-zinc-800 font-semibold font-sans">
           Products And Categories
         </label>
       </div>
@@ -66,41 +69,62 @@ const Home = () => {
       <ImageCarousel offers={offers} />
 
       <div className="flex flex-col z-10 items-start p-2 flex-wrap mt-5">
-        <label className="text-lg text-zinc-800 dark:text-white font-sans font-semibold">
+        <label className=" text-[0.9rem] xs:text-lg text-zinc-800 dark:text-white font-sans font-semibold">
           <FontAwesomeIcon icon={faTableCellsLarge} className="mr-1" />
           Shop By Category
         </label>
         <div className="w-full flex-row flex gap-1">
-          {categories.slice(0, 3).map((category) => (
-            <CategoryCard
-              key={category._id}
-              category={category}
-              onClick={() => handleCatClick(category._id)}
-            />
-          ))}
+          {!categories ? (
+            <p>Loading categories...</p>
+          ) : (
+            categories
+              .slice(0, 3)
+              .map((category) =>
+                category && category._id ? (
+                  <CategoryCard
+                    key={category._id}
+                    category={category}
+                    onClick={() => handleCatClick(category._id)}
+                  />
+                ) : null
+              )
+          )}
+
           <div className="w-[22%]  aspect-square ">
-            <Loader2 onClick={()=>navigate("/app/categories")}/>
+            <Loader2 onClick={() => navigate("/app/categories")} />
           </div>
         </div>
         <button
           onClick={() => navigate("/app/categories")}
-          className="mx-auto mt-3 p-2 rounded-lg bg-[#FFD700] hover:bg-[#ffe23d] text-white inline-flex gap-2 items-center justify-center"
+          className="mx-auto mt-3 p-2 text-sm rounded-lg bg-[#FFD700] hover:bg-[#ffe23d] text-white inline-flex gap-2 items-center justify-center"
         >
           All Categories
           <FontAwesomeIcon icon={faTableCellsLarge} />
         </button>
       </div>
       <div className="flex flex-col z-10 items-start p-2 flex-wrap">
-        <label className="text-lg text-zinc-800 dark:text-white font-sans font-semibold">
+        <label className=" text-[0.9rem] xs:text-lg text-zinc-800 dark:text-white font-sans font-semibold">
           <FontAwesomeIcon icon={faCartArrowDown} className="mr-1" />
           New Products
         </label>
-        <p className="text-sm font-mono spacing dark:text-slate-100 p-1">New products are available in the following categories!</p>
+        <p className="text-sm font-mono spacing dark:text-slate-100 p-1">
+          New products are available in the following categories!
+        </p>
         <div className="w-full flex-wrap flex gap-2">
-          {categories.map(
-            (category) =>
-              shouldDisplayCategory(category) && (
-                <CategoryCard key={category._id} category={category} newFlag={true} onClick={() => handleCatClick(category._id)}/>
+          {!categories ? (
+            <p>Loading new products...</p>
+          ) : (
+            categories
+              .slice(0, 3)
+              .map((category) =>
+                shouldDisplayCategory(category) ? (
+                  <CategoryCard
+                    key={category._id}
+                    newFlag={true}
+                    category={category}
+                    onClick={() => handleCatClick(category._id)}
+                  />
+                ) : null
               )
           )}
         </div>
@@ -167,9 +191,7 @@ const Home = () => {
                   icon={faPhone}
                   className="mx-1 text-white bg-gray-600 p-1 rounded-full"
                 />
-                <span className="me-4 md:me-6">
-                  01542185
-                </span>
+                <span className="me-4 md:me-6">01542185</span>
               </li>
             </ul>
           </div>
