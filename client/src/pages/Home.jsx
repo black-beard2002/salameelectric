@@ -55,7 +55,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-1 p-1 flex-col">
+    <div className="flex flex-1 max-w-full p-1 flex-col">
       <div className="flex z-10 flex-row gap-2 mb-10 items-center">
         <FontAwesomeIcon
           icon={faShop}
