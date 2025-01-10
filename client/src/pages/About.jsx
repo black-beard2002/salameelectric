@@ -18,7 +18,7 @@ function About() {
   )}`;
 
   return (
-    <div className="flex flex-col flex-1 relative ">
+    <div className="flex flex-col max-w-full flex-1 relative ">
       {/* Cross Bubble Layout */}
       <div className="relative w-full h-screen md:h-[80vh] lg:h-[70vh] xl:h-[60vh]">
         {/* Image 1 */}
