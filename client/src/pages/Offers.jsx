@@ -183,7 +183,7 @@ function Offers() {
   };
 
   return (
-    <div className="flex flex-col flex-1 p-1">
+    <div className="flex flex-col max-w-full flex-1 p-1">
       {alert && <CustomAlert message={message} color={color} />}
       <p className="text-2xl w-full justify-center sm:justify-center md:justify-center lg:justify-start font-sans font-semibold inline-flex items-center flex-row gap-1 mb-10 dark:text-slate-100">
         <FontAwesomeIcon
