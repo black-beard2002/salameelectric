@@ -2,23 +2,25 @@ import { useAuthStore } from "../store/auth.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 function CategoryComponentCard({ item, onUpdate, onDelete }) {
   const phoneNumber = "96103219099";
   const message = `Hello, I want to inquire about ${item.name} with the following specs: ${item.description}`;
-  const whatsAppLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  const whatsAppLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+    message
+  )}`;
   const { isAuthenticated, user } = useAuthStore();
   let isNew = false;
-  
+
   const isNewerThanTwoWeeks = (updatedAt) => {
     const currentDate = new Date();
     const itemDate = new Date(updatedAt);
-    
+
     if (itemDate > currentDate) {
       return false;
     }
-    
+
     const timeDifference = currentDate - itemDate;
     const twoWeeksInMs = 14 * 24 * 60 * 60 * 1000;
     isNew = timeDifference <= twoWeeksInMs;
@@ -32,9 +34,13 @@ function CategoryComponentCard({ item, onUpdate, onDelete }) {
           new
         </div>
       )}
-      <div className={`w-full ${isNew ? 'mt-3' : ''} flex items-start gap-2`}>
+      <div className={`w-full ${isNew ? "mt-3" : ""} flex items-start gap-2`}>
         <div className="flex-1 min-w-0">
-          <p className={`font-sans ${!item.availability ? "line-through" : ""} text-zinc-800 dark:text-slate-50 font-bold text-lg`}>
+          <p
+            className={`font-sans ${
+              !item.availability ? "line-through" : ""
+            } text-zinc-800 dark:text-slate-50 font-bold text-lg`}
+          >
             {item.name}
           </p>
           <div className="max-w-[calc(100%-4rem)] ml-2">
