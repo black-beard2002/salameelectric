@@ -185,7 +185,7 @@ function Category() {
   };
 
   return (
-    <div className="flex flex-1 p-1">
+    <div className="flex flex-1 p-1 max-w-full">
       {alert && <CustomAlert message={message} color={color} />}
       {isDeleting && (
         <Card2
