@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4000/api/app";
+const API_BASE_URL = "https://salameelectric.onrender.com/api/app";
 const CACHE_KEY = "categories";
 
 const axiosInstance = axios.create({
