@@ -8,7 +8,7 @@ const CategoryCard = ({
   return (
     <div
       onClick={onClick}
-      className="relative w-[22%]  aspect-square h-fit bg-white dark:bg-zinc-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group border border-gray-100 dark:border-zinc-700"
+      className="relative w-[22%] h-[5.8rem] xs:aspect-square h-fit bg-white dark:bg-zinc-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group border border-gray-100 dark:border-zinc-700"
     >
       {newFlag && (
         <div className="absolute top-0 rounded-tr-xl rounded-bl-xl right-0 bg-green-500 text-white px-3 py-1 text-xs font-medium z-10">
