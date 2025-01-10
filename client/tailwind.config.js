@@ -1,10 +1,19 @@
 /** @type {import('tailwindcss').Config} */
 import flowbitePlugin from 'flowbite/plugin';
+
 export default {
   darkMode: "class",
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}","./node_modules/flowbite/**/*.js"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}", "./node_modules/flowbite/**/*.js"],
   theme: {
     extend: {
+      screens: {
+        'xs': '380px', // Custom screen size
+        'sm': '540px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px',
+      },
       colors: {
         primary: {
           50: "#eff6ff",
@@ -59,6 +68,6 @@ export default {
     },
   },
   plugins: [
-    flowbitePlugin
-  ]
+    flowbitePlugin,
+  ],
 };
