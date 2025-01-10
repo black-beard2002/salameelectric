@@ -1,7 +1,4 @@
-import {
-  faLocationDot,
-  faPhone,
-} from "@fortawesome/free-solid-svg-icons";
+import { faLocationDot, faPhone } from "@fortawesome/free-solid-svg-icons";
 import image1 from "../assets/image1.png";
 import image2 from "../assets/image2.png";
 import image4 from "../assets/image4.webp";
@@ -49,19 +46,18 @@ function About() {
             About <span className="text-indigo-600">Our Company</span>
           </h2>
           <p className="text-gray-700 dark:text-slate-200">
-          At <span className="font-mono font-bold text-xl">Delta</span>,
-                we specialize in delivering top-quality electrical industry
-                products while offering cutting-edge web development services.
-                Our unique blend of expertise bridges the worlds of hardware and
-                software, catering to a diverse range of client needs. Whether
-                it&apos;s providing reliable electrical solutions or creating
-                innovative digital experiences, we thrive on synergy and
-                collaboration. Our workspace reflects this harmony, where the
-                precision of our products meets the creativity of our web
-                services, all driven by a commitment to excellence and customer
-                satisfaction. The flowing, dynamic designs represent
-                Delta&apos;s continuous pursuit of innovation and progress
-                across industries.
+            At <span className="font-mono font-bold text-xl">Delta</span>, we
+            specialize in delivering top-quality electrical industry products
+            while offering cutting-edge web development services. Our unique
+            blend of expertise bridges the worlds of hardware and software,
+            catering to a diverse range of client needs. Whether it&apos;s
+            providing reliable electrical solutions or creating innovative
+            digital experiences, we thrive on synergy and collaboration. Our
+            workspace reflects this harmony, where the precision of our products
+            meets the creativity of our web services, all driven by a commitment
+            to excellence and customer satisfaction. The flowing, dynamic
+            designs represent Delta&apos;s continuous pursuit of innovation and
+            progress across industries.
           </p>
         </div>
       </div>
