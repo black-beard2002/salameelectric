@@ -10,7 +10,7 @@ function Welcome() {
   const navigate = useNavigate();
   const [warning, setWarning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login, loginError, guestLogin,clearError } = useAuthStore();
+  const { login, loginError, guestLogin, clearError } = useAuthStore();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -99,7 +99,9 @@ function Welcome() {
               type="submit"
               className="py-1 px-8 mb-2 flex items-center justify-center bg-blue-500 hover:bg-blue-800 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg cursor-pointer select-none"
             >
-              {isLoading ? (<Loader/>) : (
+              {isLoading ? (
+                <Loader />
+              ) : (
                 <>
                   <FontAwesomeIcon icon={faUserSecret} className="mx-1" />
                   Login
