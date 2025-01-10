@@ -124,7 +124,7 @@ const Home = () => {
                     category={category}
                     onClick={() => handleCatClick(category._id)}
                   />
-                ) : null
+                ) : (<p className="w-full text-center font-medium text-sm sm:text-lg">New products will be available soon!</p>)
               )
           )}
         </div>
