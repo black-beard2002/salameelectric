@@ -22,7 +22,6 @@ function Welcome() {
     setWarning(false);
     await login({ username: username, password: password });
     setIsLoading(false);
-    clearError();
     navigate("/app");
   };
 
