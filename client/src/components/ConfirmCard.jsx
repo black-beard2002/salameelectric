@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 function Card2(props) {
   const [password, setPassword] = useState("");
 
@@ -37,7 +37,10 @@ function Card2(props) {
               process cannot be undone
             </p>
           </div>
-          <form className="p-2 mt-1 flex flex-col gap-3" onSubmit={handleSubmit}>
+          <form
+            className="p-2 mt-1 flex flex-col gap-3"
+            onSubmit={handleSubmit}
+          >
             <div className="input flex flex-col w-fit static">
               <label
                 htmlFor="input"
@@ -57,17 +60,17 @@ function Card2(props) {
               />
             </div>
 
-            <div className="flex flex-wrap justify-center">
+            <div className="flex flex-row items-center gap-2 justify-center">
               <button
                 onClick={props.onCancel}
                 type="button"
-                className="mb-2 md:mb-0 bg-gray-700 px-5 py-2 text-sm shadow-sm font-medium tracking-wider border-2 border-gray-600 hover:border-gray-700 text-gray-300 rounded-full hover:shadow-lg hover:bg-gray-800 transition ease-in duration-300"
+                className=" bg-gray-700 px-5 py-2 text-sm shadow-sm font-medium tracking-wider border-2 border-gray-600 hover:border-gray-700 text-gray-300 rounded-full hover:shadow-lg hover:bg-gray-800 transition ease-in duration-300"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-green-400 hover:bg-green-500 px-5 ml-4 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider border-2 border-green-300 hover:border-green-500 text-white rounded-full transition ease-in duration-300"
+                className="bg-green-400 hover:bg-green-500 px-5  py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider border-2 border-green-300 hover:border-green-500 text-white rounded-full transition ease-in duration-300"
               >
                 Confirm
               </button>
