@@ -14,12 +14,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useCategoryStore } from "../store/category";
 import Card2 from "../components/ConfirmCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CustomAlert from "../components/CustomAlert";
 import { useAuthStore } from "../store/auth";
+
 function Category() {
   const { id } = useParams();
-  const { categories, updateCategory } = useCategoryStore();
+  const { categories, updateCategory, isLoaded, fetchCategories } =
+    useCategoryStore();
   const [item, setItem] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -37,6 +39,12 @@ function Category() {
     availability: true,
   });
 
+  useEffect(() => {
+    if (!isLoaded) {
+      fetchCategories();
+    }
+  }, [isLoaded, fetchCategories]);
+
   const category = categories?.find((cat) => cat._id === id);
   if (!category) {
     // Fallback for undefined category
@@ -49,66 +57,49 @@ function Category() {
 
   const handleNewItem = async (e) => {
     e.preventDefault();
-    if (newItem.name.trim() !== "" && newItem.price > 0) {
-      setIsLoading(true);
-      let result = { success: false, message: "" };
-      if (state === 0) {
-        const newCategory = {
-          ...category,
-          items: [...category.items, newItem],
-        };
-        result = await updateCategory(id, newCategory);
-      } else {
-        const updatedCategory = {
-          ...category,
-          items: category.items.map((item) => {
-            if (item._id === selectedItem._id) {
-              const cleanedNewItem = { ...newItem };
-              delete cleanedNewItem.createdAt;
-              delete cleanedNewItem.updatedAt;
-              return { ...item, ...cleanedNewItem };
-            }
-            return item;
-          }),
-        };
+    if (newItem.name.trim() === "" || newItem.price <= 0) {
+      setAlert(true);
+      setColor("red-500");
+      setMessage("Enter a valid name and price > 0");
+      setTimeout(() => setAlert(false), 2000);
+      return;
+    }
 
-        result = await updateCategory(id, updatedCategory);
-      }
+    setIsLoading(true);
+    try {
+      let result;
+
+      const formData = new FormData();
+      formData.append("operation", "add");
+      formData.append("item", JSON.stringify(newItem));
+      result = await updateCategory(id, formData);
 
       if (result.success) {
         setAlert(true);
         setColor("green-500");
-        setMessage(
-          state === 0 ? "Category Item Added !" : "Category Item Updated !"
-        );
-        setTimeout(() => {
-          setAlert(false);
-        }, 2000);
-        console.log(newItem);
+        setMessage("Category Item Added!");
+        setNewItem({ name: "", price: 0, description: "", availability: true });
+        setIsEditing(false);
       } else {
         setAlert(true);
         setColor("red-500");
-        setMessage("Something went wrong!");
-        setTimeout(() => {
-          setAlert(false);
-        }, 2000);
+        setMessage("Failed to add item!");
       }
+    } catch (error) {
+      setAlert(true);
+      setColor("red-500");
+      setMessage("An error occurred while adding the item");
+    } finally {
       setIsLoading(false);
-      setIsEditing(false);
-      setNewItem({ name: "", price: 0, description: "", availability: true });
-      return;
+      setTimeout(() => setAlert(false), 2000);
     }
-    setAlert(true);
-    setColor("red-500");
-    setMessage("Enter a valid name and price>0");
-    setTimeout(() => {
-      setAlert(false);
-    }, 2000);
   };
-  const handleItemUpdate = (item) => {
+
+  const handleItemUpdate = async (item) => {
     setState(1);
     setSelectedItem(item);
     setNewItem({
+      _id: item._id,
       name: item.name,
       description: item.description,
       price: item.price,
@@ -119,36 +110,75 @@ function Category() {
     setIsEditing(true);
   };
 
-  const handelDeleting = async (password) => {
-    if (password === user.password) {
-      const updatedCategory = {
-        ...category,
-        items: category.items.filter((i) => i._id !== selectedItem._id),
-      };
-      const result = await updateCategory(id, updatedCategory);
+  const handleItemUpdateSubmit = async (e) => {
+    e.preventDefault();
+    if (newItem.name.trim() === "" || newItem.price <= 0) {
+      setAlert(true);
+      setColor("red-500");
+      setMessage("Enter a valid name and price > 0");
+      setTimeout(() => setAlert(false), 2000);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("item", JSON.stringify(newItem));
+      formData.append("itemId", newItem._id);
+      formData.append("operation", "update");
+      const result = await updateCategory(id, formData);
+
+      if (result.success) {
+        setAlert(true);
+        setColor("green-500");
+        setMessage("Category Item Updated!");
+        setNewItem({ name: "", price: 0, description: "", availability: true });
+        setIsEditing(false);
+      } else {
+        setAlert(true);
+        setColor("red-500");
+        setMessage("Failed to update item!");
+      }
+    } catch (error) {
+      setAlert(true);
+      setColor("red-500");
+      setMessage("An error occurred while updating the item");
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setAlert(false), 2000);
+    }
+  };
+
+  const handleDeleting = async (password) => {
+    if (password !== user.password) {
+      setMessage("Wrong password");
+      setColor("red-500");
+      setAlert(true);
+      setTimeout(() => setAlert(false), 2000);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("itemId", selectedItem._id);
+      formData.append("operation", "delete");
+      const result = await updateCategory(id, formData);
 
       if (result.success) {
         setColor("green-500");
-        setMessage("Category Item Deleted !");
-        setAlert(true);
-        setTimeout(() => {
-          setAlert(false);
-        }, 2000);
+        setMessage("Category Item Deleted!");
       } else {
         setColor("red-500");
         setMessage("Failed to Delete Category Item!");
-        setAlert(true);
-        setTimeout(() => {
-          setAlert(false);
-        }, 2000);
       }
+    } catch (error) {
+      setColor("red-500");
+      setMessage("An error occurred while deleting the item");
+    } finally {
+      setAlert(true);
       setIsDeleting(false);
-      return;
+      setTimeout(() => setAlert(false), 2000);
     }
-    setMessage("wrong password");
-    setColor("red-500");
-    setAlert(true);
-    setTimeout(() => setAlert(false), 2000);
   };
   const handleCancle = () => {
     setIsDeleting(false);
@@ -160,18 +190,18 @@ function Category() {
       {isDeleting && (
         <Card2
           target={selectedItem.name}
-          onConfirm={handelDeleting}
+          onConfirm={handleDeleting}
           onCancel={handleCancle}
         />
       )}
       {isEditing && (
         <div className="fixed inset-0 flex items-center z-50 justify-center bg-black bg-opacity-60">
           <form
-            onSubmit={handleNewItem}
-            className="dark:bg-gray-700 bg-slate-100 flex flex-col gap-2 rounded-lg p-6 w-96"
+            onSubmit={state === 0 ? handleNewItem : handleItemUpdateSubmit}
+            className="dark:bg-gray-700 bg-slate-100 flex flex-col gap-2 rounded-lg p-6 w-72 xs:w-96"
           >
             <h2 className="text-lg font-semibold mb-4 dark:text-slate-100">
-              {state === 0 ? "New Item" : "Update Item"}
+              {state === 0 ? "New " : "Update "}Item
             </h2>
             <div className="bg-slate-300 flex pl-2 flex-row gap-1 w-full rounded-xl p-1 items-center dark:bg-gray-800">
               <FontAwesomeIcon
@@ -183,7 +213,7 @@ function Category() {
                 value={newItem.name}
                 minLength={1}
                 required
-                maxLength={20}
+                maxLength={35}
                 onChange={(e) =>
                   setNewItem({ ...newItem, name: e.target.value })
                 }
@@ -299,7 +329,7 @@ function Category() {
           <img
             src={category.image}
             alt={category.name}
-            className="max-w-full h-64 md:aspect-video lg:aspect-video md:h-80 lg:h-96 mb-5 mx-auto max-h-80  rounded-lg"
+            className="max-w-full h-56 xs:h-64 md:aspect-video lg:aspect-video md:h-80 lg:h-96 mb-5 mx-auto max-h-80  rounded-lg"
           />
         ) : (
           <div className="w-full flex items-center justify-center mb-5 mx-auto lg:w-1/2 h-72 rounded-lg">
@@ -335,14 +365,17 @@ function Category() {
         <span className="text-sm mb-5 text-gray-500 text-center">
           Search by name, specs, or price
         </span>
-        <p className="text-2xl font-bold text-zinc-700 dark:text-slate-100 mb-2">
+        <p className="text-xl xs:text-2xl font-bold text-zinc-700 dark:text-slate-100 mb-2">
           {category.name} List:
         </p>
         {isAuthenticated && user.username !== "guest" && (
           <div>
             <button
               type="button"
-              onClick={() => {setIsEditing(true);setState(0);}}
+              onClick={() => {
+                setIsEditing(true);
+                setState(0);
+              }}
               className="bg-[#FFD700] items-center gap-1 text-white inline-flex p-2 rounded-xl mb-5"
             >
               <FontAwesomeIcon icon={faPlusCircle} />
@@ -355,9 +388,9 @@ function Category() {
             category.items
               ?.filter(
                 (i) =>
-                  i.name.toLowerCase().includes(item.toLowerCase()) ||
-                  i.description.toLowerCase().includes(item.toLowerCase()) ||
-                  i.price.toString().includes(item)
+                  i.name?.toLowerCase().includes(item.toLowerCase()) ||
+                  i.description?.toLowerCase().includes(item.toLowerCase()) ||
+                  i.price?.toString().includes(item)
               )
               .map((item) => (
                 <CategoryComponentCard
