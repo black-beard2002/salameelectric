@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
-import { useAuthStore } from "./store/auth"; // Import your Zustand auth store
-import { useEffect } from "react";
+import { useAuthStore } from "./store/auth";
+import { useCategoryStore } from "./store/category";
+import { useEffect, useState } from "react";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Offers from "./pages/Offers";
@@ -9,47 +10,61 @@ import CategoriesPage from "./pages/Categories";
 import Welcome from "./pages/Welcome";
 import RootLayout from "./layouts/RootLayout";
 
-// Protected Route Component
 const ProtectedRoute = () => {
-  const { isAuthenticated, user } = useAuthStore(); 
+  const { isAuthenticated } = useAuthStore();
+  const { fetchCategories } = useCategoryStore();
 
   useEffect(() => {
-    if (user) {
-      // Optionally, you could fetch additional user info or refresh the session here.
+    if (isAuthenticated) {
+      fetchCategories();
     }
-  }, [user]);
+  }, [isAuthenticated, fetchCategories]);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
+  return isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
+};
 
-  return <Outlet />;
+const PublicRoute = () => {
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated ? <Navigate to="/app" replace /> : <Outlet />;
 };
 
 function App() {
-  const { checkSession } = useAuthStore();
+  const { checkAuthState } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Check session on app load
   useEffect(() => {
-    checkSession();
-  }, [checkSession]);
+    const init = async () => {
+      await checkAuthState();
+      setIsLoading(false);
+    };
+    init();
+  }, [checkAuthState]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Welcome />} />
+        <Route element={<PublicRoute />}>
+          <Route path="/" element={<Welcome />} />
+        </Route>
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<RootLayout />}>
-            <Route path="/app" element={<Home />} />
-            <Route path="/app/offers" element={<Offers />} />
-            <Route path="/app/categories/:id" element={<Category />} />
-            <Route path="/app/about" element={<About />} />
-            <Route path="/app/categories" element={<CategoriesPage />} />
+            <Route index element={<Home />} />
+            <Route path="offers" element={<Offers />} />
+            <Route path="categories/:id" element={<Category />} />
+            <Route path="about" element={<About />} />
+            <Route path="categories" element={<CategoriesPage />} />
           </Route>
         </Route>
+
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/app" replace />} />
       </Routes>
     </BrowserRouter>
   );
