@@ -173,7 +173,7 @@ function Categories() {
   );
 
   return (
-    <div className="p-2 flex-1 min-h-fit bg-gray-50 dark:bg-gray-700">
+    <div className="p-2 flex-1 max-w-full min-h-fit bg-gray-50 dark:bg-gray-700">
       {isDeleting && selectedCategory && (
         <Card2
           target={selectedCategory.name}
