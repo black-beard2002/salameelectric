@@ -3,7 +3,7 @@ import { useAuthStore } from "../store/auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 function OfferCard({ offer, onDelete }) {
   const phoneNumber = "96103219099"; // Replace with the desired phone number
   const message = `Hello, I want to inquire about ${offer.title} offer`; // Default message
