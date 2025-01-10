@@ -1,122 +1,128 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4000/api";
-const AUTH_STORAGE_KEY = "authState";
-const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day in ms
+const API_BASE_URL = "http://localhost:4000/api/app";
+const CACHE_KEY = "categories";
 
-const api = axios.create({
+const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
 });
 
-export const useAuthStore = create((set, get) => ({
-  user: null,
-  isAuthenticated: false,
-  isPrime: false,
-  loginError: null,
+export const useCategoryStore = create((set, get) => ({
+  categories: [],
   isLoading: false,
+  lastSynced: null, // Track last server sync time
 
-  checkAuthState: async () => {
-    try {
-      const storedState = localStorage.getItem(AUTH_STORAGE_KEY);
-
-      if (!storedState) {
-        set({ isAuthenticated: false });
-        return false;
-      }
-
-      const { user, timestamp } = JSON.parse(storedState);
-      const isSessionValid = Date.now() - timestamp < SESSION_DURATION;
-
-      if (!isSessionValid) {
-        get().logout();
-        return false;
-      }
-
-      set({
-        user,
-        isAuthenticated: true,
-        isPrime: user.isPrime,
-      });
-
-      return true;
-    } catch (error) {
-      console.error("Auth state initialization error:", error);
-      get().logout();
-      return false;
-    }
+  setCategories: (categories) => {
+    const timestamp = Date.now();
+    set({ categories, lastSynced: timestamp });
+    // Store both categories and the sync timestamp
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({
+        data: categories,
+        timestamp,
+      })
+    );
   },
 
-  login: async ({ username, password }) => {
-    if (get().isLoading)
-      return { success: false, message: "Login in progress" };
-
-    if (!username?.trim() || !password?.trim()) {
-      set({ loginError: "Username and password are required." });
-      return { success: false, message: "Please provide valid credentials." };
-    }
+  fetchCategories: async () => {
+    const state = get();
+    if (state.isLoading)
+      return { success: false, message: "Fetch already in progress" };
 
     try {
-      set({ isLoading: true, loginError: null });
+      set({ isLoading: true });
 
-      const { data } = await api.post("/login", { username, password });
+      // Always fetch fresh data from server first
+      const { data } = await axiosInstance.get("/");
 
-      if (!data.success) {
-        set({ loginError: data.message, isLoading: false });
-        return { success: false, message: data.message };
+      get().setCategories(data.data);
+      set({ isLoading: false });
+      return { success: true };
+    } catch (error) {
+      // If server fetch fails, try to use cached data
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { data } = JSON.parse(cached);
+        if (Array.isArray(data)) {
+          set({ categories: data, isLoading: false });
+          return { success: true, fromCache: true };
+        }
       }
 
-      const authState = {
-        user: data.data,
-        timestamp: Date.now(),
+      set({ isLoading: false });
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to fetch categories",
       };
+    }
+  },
 
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authState));
+  createCategory: async (newCategory) => {
+    if (!newCategory.get("name")) {
+      return { success: false, message: "Please fill in all fields." };
+    }
 
-      set({
-        user: data.data,
-        isAuthenticated: true,
-        isPrime: data.data.isPrime,
-        loginError: null,
-        isLoading: false,
-      });
-
-      return { success: true, message: "Login successful" };
+    try {
+      const { data } = await axiosInstance.post("/create", newCategory);
+      set((state) => ({
+        categories: [...state.categories, data.data],
+        lastSynced: Date.now(),
+      }));
+      return { success: true, message: "Category created successfully" };
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Login failed. Please try again.";
-      set({
-        loginError: errorMessage,
-        isLoading: false,
-      });
-      return { success: false, message: errorMessage };
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to create category",
+      };
     }
   },
 
-  logout: () => {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-    set({
-      user: null,
-      isAuthenticated: false,
-      isPrime: false,
-      loginError: null,
-    });
+  deleteCategory: async (cid) => {
+    try {
+      const { data } = await axiosInstance.delete(`/${cid}`);
+      if (!data.success) return { success: false, message: data.message };
+
+      set((state) => ({
+        categories: state.categories.filter((category) => category._id !== cid),
+        lastSynced: Date.now(),
+      }));
+      return { success: true, message: data.message };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to delete category",
+      };
+    }
   },
 
-  clearError: () => set({ loginError: null }),
+  updateCategory: async (cid, updatedCategoryParts) => {
+    try {
+      const { data } = await axiosInstance.patch(
+        `/${cid}`,
+        updatedCategoryParts
+      );
+      if (!data.success) return { success: false, message: data.message };
+
+      set((state) => ({
+        categories: state.categories.map((category) =>
+          category._id === cid ? data.data : category
+        ),
+        lastSynced: Date.now(),
+      }));
+      return { success: true, message: "Category updated successfully" };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to update category",
+      };
+    }
+  },
+
+  clearCache: () => {
+    set({ categories: [], lastSynced: null });
+    localStorage.removeItem(CACHE_KEY);
+  },
 }));
-
-// Add request interceptor for auth headers
-api.interceptors.request.use((config) => {
-  const authState = localStorage.getItem(AUTH_STORAGE_KEY);
-  if (authState) {
-    const { user } = JSON.parse(authState);
-    if (user?.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;
-    }
-  }
-  return config;
-});
-
-export default useAuthStore;
