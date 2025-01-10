@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4000/api";
+const API_BASE_URL = "https://salameelectric.onrender.com/api";
 const AUTH_STORAGE_KEY = "authState";
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day in ms
 
