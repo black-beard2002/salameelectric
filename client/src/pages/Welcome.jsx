@@ -42,7 +42,7 @@ function Welcome() {
   };
 
   return (
-    <div className="flex flex-1 h-screen items-center bg-gradient-to-r from-sky-500 to-indigo-500 bg-cover bg-center justify-center">
+    <div className="flex flex-1 max-w-full h-screen items-center bg-gradient-to-r from-sky-500 to-indigo-500 bg-cover bg-center justify-center">
       <div className="relative min-h-fit bg-zinc-900 px-8 py-6 mt-4 text-left rounded-xl shadow-lg w-72 sm:w-72">
         <form onSubmit={handleLogin} className="min-h-96 ">
           <div className="flex flex-col justify-center items-center h-full select-none">
