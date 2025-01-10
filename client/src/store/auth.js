@@ -47,6 +47,38 @@ export const useAuthStore = create((set, get) => ({
       return false;
     }
   },
+ guestLogin: async () => {
+    try {
+      set({ isLoading: true, loginError: null });
+
+      const guestUser = {
+        username: "guest"
+      };
+
+      const authState = {
+        user: guestUser,
+        timestamp: Date.now(),
+      };
+
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authState));
+
+      set({
+        user: guestUser,
+        isAuthenticated: true,
+        isPrime: false,
+        loginError: null,
+        isLoading: false,
+      });
+
+      return { success: true, message: "Guest login successful" };
+    } catch (error) {
+      set({
+        loginError: "Guest login failed",
+        isLoading: false,
+      });
+      return { success: false, message: "Guest login failed" };
+    }
+  }, 
 
   login: async ({ username, password }) => {
     if (get().isLoading)
