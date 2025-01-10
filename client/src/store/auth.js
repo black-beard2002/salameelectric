@@ -1,86 +1,122 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import axios from "axios";
 
-export const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      user: null, // Stores user information after login
-      isAuthenticated: false, // Tracks if the user is authenticated
-      loginError: null, // Tracks login errors
-      isPrime: false,
-      lastLogin: null, // Store the timestamp of the last login
+const API_BASE_URL = "http://localhost:4000/api";
+const AUTH_STORAGE_KEY = "authState";
+const SESSION_DURATION = 24 * 60 * 60 * 1000; // 1 day in ms
 
-      // Method to handle user login
-      login: async ({ username, password }) => {
-        if (!username || !password) {
-          set({ loginError: "Username and password are required." });
-          return { success: false, message: "Please provide valid credentials." };
-        }
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+});
 
-        try {
-          const response = await fetch(`${import.meta.env.VITE_RENDERHOST_URL}/api/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-          });
-          const data = await response.json();
+export const useAuthStore = create((set, get) => ({
+  user: null,
+  isAuthenticated: false,
+  isPrime: false,
+  loginError: null,
+  isLoading: false,
 
-          if (!data.success) {
-            set({ loginError: data.message });
-            return { success: false, message: data.message };
-          }
+  checkAuthState: async () => {
+    try {
+      const storedState = localStorage.getItem(AUTH_STORAGE_KEY);
 
-          const currentTimestamp = Date.now(); // Get the current timestamp
-          set({
-            user: data.data,
-            isAuthenticated: true,
-            loginError: null,
-            isPrime: data.data.isPrime,
-            lastLogin: currentTimestamp, // Set the login timestamp
-          });
+      if (!storedState) {
+        set({ isAuthenticated: false });
+        return false;
+      }
 
-          return { success: true, message: "Login successful." };
-        } catch (error) {
-          set({ loginError: "An error occurred during login." });
-          return { success: false, message: "An error occurred during login." };
-        }
-      },
+      const { user, timestamp } = JSON.parse(storedState);
+      const isSessionValid = Date.now() - timestamp < SESSION_DURATION;
 
-      // Method to handle guest login
-      guestLogin: () => {
-        set({
-          user: { username: "guest" },
-          isAuthenticated: true,
-          loginError: null,
-          lastLogin: Date.now(), // Set the login timestamp for guest login
-        });
-        return { success: true, message: "Login as guest." };
-      },
+      if (!isSessionValid) {
+        get().logout();
+        return false;
+      }
 
-      // Method to handle user logout
-      logout: () => {
-        set({ user: null, isAuthenticated: false, loginError: null, lastLogin: null });
-        localStorage.setItem("categories", {}); // Save to localStorage
-      },
+      set({
+        user,
+        isAuthenticated: true,
+        isPrime: user.isPrime,
+      });
 
-      // Method to check if the session has expired
-      checkSession: () => {
-        const currentTimestamp = Date.now();
-        const sessionTimeout = 3600000; // 1 hour in milliseconds
-        const lastLogin = get().lastLogin;
-
-        if (lastLogin && currentTimestamp - lastLogin > sessionTimeout) {
-          set({ user: null, isAuthenticated: false, loginError: null, lastLogin: null });
-        }
-      },
-
-      // Clear errors
-      clearError: () => {
-        set({ loginError: null });
-      },
-    }),
-    {
-      name: "auth-storage", // Key in localStorage for persistence
+      return true;
+    } catch (error) {
+      console.error("Auth state initialization error:", error);
+      get().logout();
+      return false;
     }
-  )
-);
+  },
+
+  login: async ({ username, password }) => {
+    if (get().isLoading)
+      return { success: false, message: "Login in progress" };
+
+    if (!username?.trim() || !password?.trim()) {
+      set({ loginError: "Username and password are required." });
+      return { success: false, message: "Please provide valid credentials." };
+    }
+
+    try {
+      set({ isLoading: true, loginError: null });
+
+      const { data } = await api.post("/login", { username, password });
+
+      if (!data.success) {
+        set({ loginError: data.message, isLoading: false });
+        return { success: false, message: data.message };
+      }
+
+      const authState = {
+        user: data.data,
+        timestamp: Date.now(),
+      };
+
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authState));
+
+      set({
+        user: data.data,
+        isAuthenticated: true,
+        isPrime: data.data.isPrime,
+        loginError: null,
+        isLoading: false,
+      });
+
+      return { success: true, message: "Login successful" };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Login failed. Please try again.";
+      set({
+        loginError: errorMessage,
+        isLoading: false,
+      });
+      return { success: false, message: errorMessage };
+    }
+  },
+
+  logout: () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    set({
+      user: null,
+      isAuthenticated: false,
+      isPrime: false,
+      loginError: null,
+    });
+  },
+
+  clearError: () => set({ loginError: null }),
+}));
+
+// Add request interceptor for auth headers
+api.interceptors.request.use((config) => {
+  const authState = localStorage.getItem(AUTH_STORAGE_KEY);
+  if (authState) {
+    const { user } = JSON.parse(authState);
+    if (user?.token) {
+      config.headers.Authorization = `Bearer ${user.token}`;
+    }
+  }
+  return config;
+});
+
+export default useAuthStore;
