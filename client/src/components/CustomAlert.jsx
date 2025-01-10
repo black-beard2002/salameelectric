@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
-const CustomAlert=(props)=> {
-    return (
-      <div
+import PropTypes from "prop-types";
+const CustomAlert = (props) => {
+  return (
+    <div
       className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center p-4 mb-4 text-sm text-white rounded-lg bg-${props.color}`}
       role="alert"
     >
@@ -19,12 +19,12 @@ const CustomAlert=(props)=> {
         <span className="font-medium">{props.message}</span>
       </div>
     </div>
-    )
-  }
-  
-  export default CustomAlert;
+  );
+};
 
-  CustomAlert.propTypes = {
-    message: PropTypes.string.isRequired,
-    color: PropTypes.string.isRequired,
-  };
+export default CustomAlert;
+
+CustomAlert.propTypes = {
+  message: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+};
