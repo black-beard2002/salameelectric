@@ -122,9 +122,9 @@ function About() {
                   icon={faPhone}
                   className="mx-1 text-white bg-gray-600 p-1 rounded-full"
                 />
-                <a href={whatsAppLink} className="hover:underline me-4 md:me-6">
-                  Phone
-                </a>
+                <span className="me-4 md:me-6">
+                  01542185
+                </span>
               </li>
             </ul>
           </div>
