@@ -42,7 +42,7 @@ const ImageCarousel = ({ offers = [] }) => {
 
   if (!slides.length) {
     return (
-      <div className="relative w-full flex-col flex items-center justify-center bg-gray-100 py-5 dark:bg-gray-800">
+      <div className="relative w-3/4 mx-auto xs:w-full flex-col flex items-center justify-center bg-gray-100 py-5 dark:bg-gray-800">
         <FontAwesomeIcon
           icon={faGift}
           className="w-7 h-7 text-gray-700 dark:text-gray-300"
@@ -55,8 +55,8 @@ const ImageCarousel = ({ offers = [] }) => {
   }
 
   return (
-    <div className="relative w-11/12 md:w-2/3 lg:w-2/3 mx-auto">
-      <div className="relative h-56 overflow-hidden rounded-lg lg:h-96">
+    <div className="relative w-[85%] sm:w-3/4 md:w-3/4 lg:w-2/3 xl:w-2/3 mx-auto">
+      <div className="relative h-44 xs:h-48 sm:h-56 md:h-72 overflow-hidden rounded-lg lg:h-96 xl:h-[32rem]">
         {slides.map((offer, index) => (
           <div
             key={index}
@@ -78,7 +78,7 @@ const ImageCarousel = ({ offers = [] }) => {
                 onClick={() => {
                   navigate("/app/offers");
                 }}
-                className="absolute block cursor-pointer hover:scale-105 duration-200 max-w-full max-h-full w-full h-full aspect-square object-fit"
+                className="absolute block cursor-pointer hover:scale-105 duration-200 max-w-full max-h-full w-full aspect-square object-fit"
                 alt={offer.title}
               />
               {/* Overlay container */}
