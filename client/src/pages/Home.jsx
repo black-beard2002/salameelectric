@@ -78,7 +78,7 @@ const Home = () => {
             {!categories ? (
               <p>Loading categories...</p>
             ) : (
-              categories.slice(0, 8).map((category) =>
+              categories.slice(0, 15).map((category) =>
                 category && category._id ? (
                   <div className="flex-none w-40 md:w-64" key={category._id}>
                     {" "}
