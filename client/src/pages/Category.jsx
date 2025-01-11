@@ -8,6 +8,7 @@ import {
   faCalendarCheck,
   faD,
   faDollarSign,
+  faImage,
   faPlusCircle,
   faSearch,
   faT,
@@ -26,6 +27,7 @@ function Category() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [itemImage, setItemImage] = useState(null);
   const [selectedItem, setSelectedItem] = useState({});
   const [state, setState] = useState(0); // 0 means new category, 1 means updating category
   const [alert, setAlert] = useState(false);
@@ -36,6 +38,8 @@ function Category() {
     name: "",
     price: 0,
     description: "",
+    offerPrice: 0,
+    image: null,
     availability: true,
   });
 
@@ -55,40 +59,41 @@ function Category() {
     );
   }
 
+  const showAlert = (msg, clr, duration = 2000) => {
+    setMessage(msg);
+    setColor(clr);
+    setAlert(true);
+    setTimeout(() => setAlert(false), duration);
+  };
+
+
   const handleNewItem = async (e) => {
     e.preventDefault();
     if (newItem.name.trim() === "" || newItem.price <= 0) {
-      setAlert(true);
-      setColor("red-500");
-      setMessage("Enter a valid name and price > 0");
-      setTimeout(() => setAlert(false), 2000);
+      showAlert("Enter a valid name and price > 0", "red-500");
       return;
     }
 
     setIsLoading(true);
     try {
       let result;
-
       const formData = new FormData();
       formData.append("operation", "add");
       formData.append("item", JSON.stringify(newItem));
+      if (itemImage) {
+        formData.append("itemImage", itemImage);
+      }
       result = await updateCategory(id, formData);
 
       if (result.success) {
-        setAlert(true);
-        setColor("green-500");
-        setMessage("Category Item Added!");
+        showAlert("Category Item Added!", "green-500");
         setNewItem({ name: "", price: 0, description: "", availability: true });
         setIsEditing(false);
       } else {
-        setAlert(true);
-        setColor("red-500");
-        setMessage("Failed to add item!");
+        showAlert("Failed to add item!", "red-500");
       }
     } catch (error) {
-      setAlert(true);
-      setColor("red-500");
-      setMessage("An error occurred while adding the item");
+      showAlert("An error occurred while adding the item", "red-500");
     } finally {
       setIsLoading(false);
       setTimeout(() => setAlert(false), 2000);
@@ -103,6 +108,8 @@ function Category() {
       name: item.name,
       description: item.description,
       price: item.price,
+      offerPrice: item.offerPrice,
+      image: item.image,
       availability: item.availability,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
@@ -113,10 +120,7 @@ function Category() {
   const handleItemUpdateSubmit = async (e) => {
     e.preventDefault();
     if (newItem.name.trim() === "" || newItem.price <= 0) {
-      setAlert(true);
-      setColor("red-500");
-      setMessage("Enter a valid name and price > 0");
-      setTimeout(() => setAlert(false), 2000);
+      showAlert("Enter a valid name and price > 0", "red-500");
       return;
     }
 
@@ -126,35 +130,44 @@ function Category() {
       formData.append("item", JSON.stringify(newItem));
       formData.append("itemId", newItem._id);
       formData.append("operation", "update");
+      if (itemImage) {
+        formData.append("itemImage", itemImage);
+      }
       const result = await updateCategory(id, formData);
 
       if (result.success) {
-        setAlert(true);
-        setColor("green-500");
-        setMessage("Category Item Updated!");
+        showAlert("Category Item Updated!", "green-500");
         setNewItem({ name: "", price: 0, description: "", availability: true });
         setIsEditing(false);
       } else {
-        setAlert(true);
-        setColor("red-500");
-        setMessage("Failed to update item!");
+        console.log(result)
+        showAlert("Failed to update item!", "red-500");
       }
     } catch (error) {
-      setAlert(true);
-      setColor("red-500");
-      setMessage("An error occurred while updating the item");
+      showAlert("An error occurred while updating the item", "red-500");
     } finally {
       setIsLoading(false);
       setTimeout(() => setAlert(false), 2000);
     }
   };
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setItemImage(file);
+    } catch (error) {
+      console.error("Error processing image:", error);
+      showAlert(
+        "Error processing image. Please try a different image.",
+        "red-500"
+      );
+    }
+  };
 
   const handleDeleting = async (password) => {
     if (password !== user.password) {
-      setMessage("Wrong password");
-      setColor("red-500");
-      setAlert(true);
-      setTimeout(() => setAlert(false), 2000);
+      showAlert("Wrong password", "red-500");
       return;
     }
 
@@ -185,7 +198,7 @@ function Category() {
   };
 
   return (
-    <div className="flex flex-1 p-1 max-w-full">
+    <div className="flex flex-1 p-1">
       {alert && <CustomAlert message={message} color={color} />}
       {isDeleting && (
         <Card2
@@ -238,6 +251,40 @@ function Category() {
                 placeholder="description"
               />
             </div>
+            <div className="flex flex-col w-full max-w-xs gap-1 pl-1">
+              <label className="text-sm dark:text-slate-100 text-gray-700 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <FontAwesomeIcon
+                  icon={faImage}
+                  className="w-4 mr-1 dark:text-slate-200 h-4"
+                />
+                Image
+              </label>
+              <input
+                id="picture"
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="flex h-10 w-full rounded-md border border-input bg-white px-3 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-gray-600 file:text-sm file:font-medium"
+              />
+            </div>
+            <div className="bg-slate-300 flex flex-row pl-2 gap-1 p-1 rounded-xl items-center dark:bg-gray-800">
+              <FontAwesomeIcon
+                icon={faDollarSign}
+                className="w-4 dark:text-slate-200 h-4"
+              />
+              <input
+                type="number"
+                value={newItem.price}
+                minLength={1}
+                required
+                maxLength={5}
+                onChange={(e) =>
+                  setNewItem({ ...newItem, price: e.target.value })
+                }
+                className="w-full focus:outline-none  text-sm border-none rounded   text-zinc-900 dark:text-slate-50 bg-transparent"
+                placeholder="price $"
+              />
+            </div>
             <div className="bg-slate-300 flex flex-col pl-2 gap-1 p-1 rounded-xl  dark:bg-gray-800">
               <div className="flex flex-row items-center">
                 <FontAwesomeIcon
@@ -271,22 +318,24 @@ function Category() {
                 </button>
               </div>
             </div>
-            <div className="bg-slate-300 flex flex-row pl-2 gap-1 p-1 rounded-xl items-center dark:bg-gray-800">
-              <FontAwesomeIcon
-                icon={faDollarSign}
-                className="w-4 dark:text-slate-200 h-4"
-              />
+            <div className="bg-slate-300 flex flex-col pl-2 gap-1 p-1 rounded-xl items-center dark:bg-gray-800">
+              <div className="flex flex-row items-center justify-start w-full">
+                <FontAwesomeIcon
+                  icon={faDollarSign}
+                  className="w-4 dark:text-slate-200 h-4"
+                />
+                <p className="text-sm ml-3 text-gray-500">Offer price</p>
+              </div>
               <input
                 type="number"
-                value={newItem.price}
+                value={newItem.offerPrice}
                 minLength={1}
-                required
                 maxLength={5}
                 onChange={(e) =>
-                  setNewItem({ ...newItem, price: e.target.value })
+                  setNewItem({ ...newItem, offerPrice: e.target.value })
                 }
                 className="w-full focus:outline-none  text-sm border-none rounded   text-zinc-900 dark:text-slate-50 bg-transparent"
-                placeholder="price $"
+                placeholder="offer price"
               />
             </div>
             {state === 1 && (
@@ -383,7 +432,7 @@ function Category() {
             </button>
           </div>
         )}
-        <div className="flex flex-col flex-1">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 pb-4 w-full">
           {category.items.length !== 0 ? (
             category.items
               ?.filter(
