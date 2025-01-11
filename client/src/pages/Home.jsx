@@ -55,7 +55,7 @@ const Home = () => {
   };
 
   return (
-    <div className="flex flex-1 max-w-full p-1 flex-col">
+    <div className="flex flex-1 p-1 max-w-full flex-col">
       <div className="flex z-10 flex-row gap-2 mb-10 items-center">
         <FontAwesomeIcon
           icon={faShop}
@@ -73,25 +73,24 @@ const Home = () => {
           <FontAwesomeIcon icon={faTableCellsLarge} className="mr-1" />
           Shop By Category
         </label>
-        <div className="w-full flex-row flex gap-1">
-          {!categories ? (
-            <p>Loading categories...</p>
-          ) : (
-            categories
-              .slice(0, 3)
-              .map((category) =>
+        <div className="w-full overflow-x-auto scrollbar-hide mt-2">
+          <div className="flex flex-nowrap gap-2 pb-2">
+            {!categories ? (
+              <p>Loading categories...</p>
+            ) : (
+              categories.slice(0, 8).map((category) =>
                 category && category._id ? (
-                  <CategoryCard
-                    key={category._id}
-                    category={category}
-                    onClick={() => handleCatClick(category._id)}
-                  />
+                  <div className="flex-none w-40 md:w-64" key={category._id}>
+                    {" "}
+                    {/* Adjust width as needed */}
+                    <CategoryCard
+                      category={category}
+                      onClick={() => handleCatClick(category._id)}
+                    />
+                  </div>
                 ) : null
               )
-          )}
-
-          <div className="w-[22%]  aspect-square ">
-            <Loader2 onClick={() => navigate("/app/categories")} />
+            )}
           </div>
         </div>
         <button
@@ -124,7 +123,7 @@ const Home = () => {
                     category={category}
                     onClick={() => handleCatClick(category._id)}
                   />
-                ) : (<p className="w-full text-center font-medium text-sm sm:text-lg">New products will be available soon!</p>)
+                ) : null
               )
           )}
         </div>
