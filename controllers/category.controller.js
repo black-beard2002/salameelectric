@@ -4,31 +4,35 @@ import multer from "multer";
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 dotenv.config();
+
 // Constants
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const BUCKET_NAME = "uploads";
 const CATEGORY_FOLDER = "categories";
+const ITEM_FOLDER = "items";
 
 // Initialize Supabase client
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Multer setup for file handling
-const upload = multer({ storage: multer.memoryStorage() }).single("image");
+// Multer setup for file handling - modified to handle multiple files
+const upload = multer({ storage: multer.memoryStorage() }).fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'itemImage', maxCount: 1 }
+]);
 
 // Utility functions
-const generateFileName = (categoryId, originalName) => {
+const generateFileName = (id, originalName, type = 'category') => {
   const currentDate = new Date();
-  const formattedDate = currentDate.toISOString().split("T")[0]; // Get YYYY-MM-DD format
+  const formattedDate = currentDate.toISOString().split("T")[0];
   const cleanFileName = originalName.replace(/\s+/g, "-");
-  return `${CATEGORY_FOLDER}/${categoryId}_${formattedDate}_${cleanFileName}`;
+  const folder = type === 'category' ? CATEGORY_FOLDER : ITEM_FOLDER;
+  return `${folder}/${id}_${formattedDate}_${cleanFileName}`;
 };
 
 const getImagePathFromUrl = (imageUrl) => {
   try {
     if (!imageUrl) return null;
-
-    // Extract the path after the bucket name
     const pathMatch = imageUrl.match(new RegExp(`${BUCKET_NAME}/(.*)`));
     return pathMatch ? pathMatch[1] : null;
   } catch (error) {
@@ -93,7 +97,7 @@ export const createCategory = async (req, res) => {
 
     try {
       const { name } = req.body;
-      const file = req.file;
+      const file = req.files?.image?.[0];
 
       if (!name) {
         return res.status(400).json({
@@ -102,19 +106,15 @@ export const createCategory = async (req, res) => {
         });
       }
 
-      // First create category to get the ID
       const category = await Category.create({
         name,
         items: [],
         image: "",
       });
 
-      // If there's a file, upload it using the category ID
       if (file) {
         const fileName = generateFileName(category._id, file.originalname);
         const imageUrl = await uploadToSupabase(file, fileName);
-
-        // Update category with image URL
         category.image = imageUrl;
         await category.save();
       }
@@ -142,8 +142,9 @@ export const updateCategory = async (req, res) => {
 
     try {
       const { id } = req.params;
-      const { name, item, itemId, operation } = req.body; // Get item-related data from request
-      const file = req.file;
+      const { name, item, itemId, operation } = req.body;
+      const categoryFile = req.files?.image?.[0];
+      const itemFile = req.files?.itemImage?.[0];
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({
@@ -160,62 +161,76 @@ export const updateCategory = async (req, res) => {
         });
       }
 
-      // Update Items
+      // Handle item operations
       let currentItems = [...existingCategory.items];
-      if (operation === "delete") {
-        currentItems = currentItems.filter(
-          (item) => item._id.toString() !== itemId
-        );
-
-        const updatedCategory = await Category.findByIdAndUpdate(
-          id,
-          { items: currentItems },
-          { new: true } // Important: return the updated document
-        );
-
-        if (!updatedCategory) {
-          return res.status(404).json({
-            success: false,
-            message: "Failed to update category",
-          });
-        }
-
-        return res.status(200).json({
-          success: true,
-          data: updatedCategory,
-        });
-      }
-      if (item) {
+      if (item || operation === 'delete') {
         switch (operation) {
           case "add":
-            const newItem = JSON.parse(item); // Parse incoming item object
+            const newItem = JSON.parse(item);
             newItem.price = parseFloat(newItem.price);
+            newItem.offerPrice = parseFloat(newItem.offerPrice);
+            // Handle item image upload for new item
+            if (itemFile) {
+              const fileName = generateFileName(
+                `${id}_item_${new mongoose.Types.ObjectId()}`,
+                itemFile.originalname,
+                'item'
+              );
+              newItem.image = await uploadToSupabase(itemFile, fileName);
+            }
+            
             currentItems.push(newItem);
             break;
-          case "update":
-            // Parse and prepare the updated item
-            const updatedItem = JSON.parse(item); // Parse updated item
-            updatedItem.price = parseFloat(updatedItem.price);
 
-            // Find the index of the item to update
-            const index = currentItems.findIndex(
+          case "update":
+            const updatedItem = JSON.parse(item);
+            updatedItem.price = parseFloat(updatedItem.price);
+            updatedItem.offerPrice = parseFloat(updatedItem.offerPrice);
+            const itemIndex = currentItems.findIndex(
               (item) => item._id.toString() === itemId
             );
 
-            if (index !== -1) {
-              // If the item is found, update it
-              currentItems[index] = {
-                _id: currentItems[index]._id,
+            if (itemIndex !== -1) {
+              // Handle item image update
+              if (itemFile) {
+                // Delete old image if it exists
+                if (currentItems[itemIndex].image) {
+                  await deleteSupabaseImage(currentItems[itemIndex].image);
+                }
+                
+                const fileName = generateFileName(
+                  `${id}_item_${itemId}`,
+                  itemFile.originalname,
+                  'item'
+                );
+                updatedItem.image = await uploadToSupabase(itemFile, fileName);
+              } else {
+                // Keep existing image if no new image is uploaded
+                updatedItem.image = currentItems[itemIndex].image;
+              }
+
+              currentItems[itemIndex] = {
+                _id: currentItems[itemIndex]._id,
                 ...updatedItem,
               };
             }
-
             break;
+
           case "delete":
+            const itemToDelete = currentItems.find(
+              (item) => item._id.toString() === itemId
+            );
+            
+            // Delete item image if it exists
+            if (itemToDelete?.image) {
+              await deleteSupabaseImage(itemToDelete.image);
+            }
+            
             currentItems = currentItems.filter(
               (item) => item._id.toString() !== itemId
             );
             break;
+
           default:
             return res.status(400).json({
               success: false,
@@ -231,20 +246,20 @@ export const updateCategory = async (req, res) => {
         return res.status(200).json({ success: true, data: updatedCategory });
       }
 
-      // Update Name or Image
+      // Handle category updates (name or image)
       const updateFields = {};
       if (name) {
         updateFields.name = name;
       }
 
-      if (file) {
+      if (categoryFile) {
         try {
           if (existingCategory.image) {
             await deleteSupabaseImage(existingCategory.image);
           }
 
-          const fileName = generateFileName(id, file.originalname);
-          const newImageUrl = await uploadToSupabase(file, fileName);
+          const fileName = generateFileName(id, categoryFile.originalname);
+          const newImageUrl = await uploadToSupabase(categoryFile, fileName);
           updateFields.image = newImageUrl;
         } catch (error) {
           return res.status(500).json({
@@ -298,9 +313,16 @@ export const deleteCategory = async (req, res) => {
       });
     }
 
-    // Delete image from Supabase if exists
+    // Delete category image if exists
     if (category.image) {
       await deleteSupabaseImage(category.image);
+    }
+
+    // Delete all item images
+    for (const item of category.items) {
+      if (item.image) {
+        await deleteSupabaseImage(item.image);
+      }
     }
 
     // Delete category from MongoDB
@@ -308,7 +330,7 @@ export const deleteCategory = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Category and associated image deleted successfully",
+      message: "Category and all associated images deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
