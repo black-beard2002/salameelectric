@@ -18,6 +18,14 @@ const itemSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    offerPrice:{
+      type:Number,
+      required:false
+    },
+    image:{
+      type: String,
+      required: false,
+    }
   },
   {
     timestamps: true, // createdAt, updatedAt
