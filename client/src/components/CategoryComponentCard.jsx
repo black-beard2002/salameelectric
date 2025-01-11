@@ -159,7 +159,7 @@ export default CategoryComponentCard;
 CategoryComponentCard.propTypes = {
   item: PropTypes.shape({
     description: PropTypes.string,
-    availability: PropTypes.bool.isRequired,
+    availability: PropTypes.bool,
     name: PropTypes.string.isRequired,
     image: PropTypes.string,
     offerPrice: PropTypes.number,
