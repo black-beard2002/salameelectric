@@ -199,7 +199,7 @@ export const updateCategory = async (req, res) => {
                 }
                 
                 const fileName = generateFileName(
-                  `${id}_item_${itemId}`,
+                  `${id}_item_${item._id}`,
                   itemFile.originalname,
                   'item'
                 );
