@@ -87,7 +87,7 @@ function Category() {
 
       if (result.success) {
         showAlert("Category Item Added!", "green-500");
-        setNewItem({ name: "", price: 0, description: "", availability: true });
+        setNewItem({ name: "", price: 0,offerPrice:0,image:null, description: "", availability: true });
         setIsEditing(false);
       } else {
         showAlert("Failed to add item!", "red-500");
@@ -137,7 +137,7 @@ function Category() {
 
       if (result.success) {
         showAlert("Category Item Updated!", "green-500");
-        setNewItem({ name: "", price: 0, description: "", availability: true });
+        setNewItem({ name: "", price: 0,offerPrice:0,image:null, description: "", availability: true });
         setIsEditing(false);
       } else {
         console.log(result)
