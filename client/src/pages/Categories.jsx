@@ -319,7 +319,7 @@ function Categories() {
                   src={cat.image.replace("your-bucket-name", "uploads")}
                   alt={cat.name}
                   onClick={() => handleCatClick(cat._id)}
-                  className="w-full aspect-square transform hover:scale-110 duration-300 object-fit"
+                  className="w-full h-auto transform hover:scale-110 duration-300 object-fit"
                 />
               ) : (
                 <div
