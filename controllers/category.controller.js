@@ -178,12 +178,14 @@ export const updateCategory = async (req, res) => {
               );
               newItem.image = await uploadToSupabase(itemFile, fileName);
             }
-            
+            console.log("hiiiiiiiiiiiiiiiiiii",newItem)
             currentItems.push(newItem);
             break;
 
           case "update":
             const updatedItem = JSON.parse(item);
+            console.log(updatedItem._id);
+            
             updatedItem.price = parseFloat(updatedItem.price);
             updatedItem.offerPrice = parseFloat(updatedItem.offerPrice);
             const itemIndex = currentItems.findIndex(
@@ -193,13 +195,14 @@ export const updateCategory = async (req, res) => {
             if (itemIndex !== -1) {
               // Handle item image update
               if (itemFile) {
+                console.log('item file exist')
                 // Delete old image if it exists
                 if (currentItems[itemIndex].image) {
                   await deleteSupabaseImage(currentItems[itemIndex].image);
                 }
                 
                 const fileName = generateFileName(
-                  `${id}_item_${item._id}`,
+                  `${id}_item_${itemId}`,
                   itemFile.originalname,
                   'item'
                 );
@@ -213,6 +216,8 @@ export const updateCategory = async (req, res) => {
                 _id: currentItems[itemIndex]._id,
                 ...updatedItem,
               };
+              console.log("hiii",currentItems[itemIndex])
+              currentItems.push(newItem);
             }
             break;
 
