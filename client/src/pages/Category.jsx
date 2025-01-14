@@ -130,6 +130,9 @@ function Category() {
       formData.append("item", JSON.stringify(newItem));
       formData.append("itemId", newItem._id);
       formData.append("operation", "update");
+      if(!newItem.image){
+        formData.append("itemImage",null)
+      }
       if (itemImage) {
         formData.append("itemImage", itemImage);
       }
@@ -140,7 +143,6 @@ function Category() {
         setNewItem({ name: "", price: 0,offerPrice:0,image:null, description: "", availability: true });
         setIsEditing(false);
       } else {
-        console.log(result)
         showAlert("Failed to update item!", "red-500");
       }
     } catch (error) {
