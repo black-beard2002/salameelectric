@@ -42,18 +42,38 @@ const Home = () => {
     navigate(`/app/categories/${id}`);
   };
   const isNewerThanTwoWeeks = (createdAt) => {
+    if (!createdAt) return false;
+
     const currentDate = new Date();
-    const categoryDate = new Date(createdAt); // The string is in ISO format, which is compatible with Date
+    const categoryDate = new Date(createdAt);
+
+    // Check if the date is valid
+    if (isNaN(categoryDate.getTime())) return false;
+
     const timeDifference = currentDate - categoryDate; // Difference in milliseconds
     const twoWeeksInMs = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
     return timeDifference <= twoWeeksInMs;
   };
 
   const shouldDisplayCategory = (category) => {
-    // Check if category and items exist and at least one item is newer than 2 weeks
-    return category?.items?.some((item) => isNewerThanTwoWeeks(item.createdAt));
-  };
+    // If category doesn't exist or has no items, don't display
+    if (
+      !category ||
+      !Array.isArray(category.items) ||
+      category.items.length === 0
+    ) {
+      return false;
+    }
 
+    // Check if at least one item is newer than 2 weeks
+    return category.items.some((item) => {
+      // Ensure item exists and has a createdAt property
+      if (!item || !item.createdAt) {
+        return false;
+      }
+      return isNewerThanTwoWeeks(item.createdAt);
+    });
+  };
   return (
     <div className="flex flex-1 p-1 max-w-full flex-col">
       <div className="flex z-10 flex-row gap-2 mb-10 items-center">
@@ -102,30 +122,37 @@ const Home = () => {
         </button>
       </div>
       <div className="flex flex-col z-10 items-start p-2 flex-wrap">
-        <label className=" text-[0.9rem] xs:text-lg text-zinc-800 dark:text-white font-sans font-semibold">
+        <label className="text-[0.9rem] xs:text-lg text-zinc-800 dark:text-white font-sans font-semibold">
           <FontAwesomeIcon icon={faCartArrowDown} className="mr-1" />
           New Products
         </label>
         <p className="text-sm font-mono spacing dark:text-slate-100 p-1">
           New products are available in the following categories!
         </p>
-        <div className="w-full flex-wrap flex gap-2">
-          {!categories ? (
-            <p>Loading new products...</p>
-          ) : (
-            categories
-              .slice(0, 3)
-              .map((category) =>
-                shouldDisplayCategory(category) ? (
-                  <CategoryCard
-                    key={category._id}
-                    newFlag={true}
-                    category={category}
-                    onClick={() => handleCatClick(category._id)}
-                  />
-                ) : null
-              )
-          )}
+        {/* Update this container div to match the category section styling */}
+        <div className="w-full overflow-x-auto scrollbar-hide mt-2">
+          <div className="flex flex-nowrap gap-2 pb-2">
+            {!categories ? (
+              <p>Loading new products...</p>
+            ) : categories.filter(shouldDisplayCategory).length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                No new products available at the moment.
+              </p>
+            ) : (
+              categories
+                .filter(shouldDisplayCategory)
+                .slice(0, 3)
+                .map((category) => (
+                  <div className="flex-none w-40 md:w-64" key={category._id}>
+                    <CategoryCard
+                      newFlag={true}
+                      category={category}
+                      onClick={() => handleCatClick(category._id)}
+                    />
+                  </div>
+                ))
+            )}
+          </div>
         </div>
       </div>
 
