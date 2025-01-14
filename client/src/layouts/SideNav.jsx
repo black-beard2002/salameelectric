@@ -151,7 +151,7 @@ function SideNav({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-[#dcdcdd] font-sans dark:bg-gray-800 dark:text-slate-50">
+        <div className="h-full px-3 pb-4 overflow-y-auto overflow-x-hidden bg-[#dcdcdd] font-sans dark:bg-gray-800 dark:text-slate-50">
           <ul className="space-y-2 font-bold">
             <li onClick={() => isMobile && setIsSidebarOpen(false)}>
               <Link
