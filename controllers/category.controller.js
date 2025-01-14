@@ -178,48 +178,43 @@ export const updateCategory = async (req, res) => {
               );
               newItem.image = await uploadToSupabase(itemFile, fileName);
             }
-            console.log("hiiiiiiiiiiiiiiiiiii",newItem)
             currentItems.push(newItem);
             break;
 
-          case "update":
-            const updatedItem = JSON.parse(item);
-            console.log(updatedItem._id);
+            case "update":
+              const updatedItem = JSON.parse(item);
+              
+              updatedItem.price = parseFloat(updatedItem.price);
+              updatedItem.offerPrice = parseFloat(updatedItem.offerPrice);
+              const itemIndex = currentItems.findIndex(
+                (item) => item._id.toString() === itemId
+              );
             
-            updatedItem.price = parseFloat(updatedItem.price);
-            updatedItem.offerPrice = parseFloat(updatedItem.offerPrice);
-            const itemIndex = currentItems.findIndex(
-              (item) => item._id.toString() === itemId
-            );
-
-            if (itemIndex !== -1) {
-              // Handle item image update
-              if (itemFile) {
-                console.log('item file exist')
-                // Delete old image if it exists
-                if (currentItems[itemIndex].image) {
-                  await deleteSupabaseImage(currentItems[itemIndex].image);
+              if (itemIndex !== -1) {
+                // Handle item image update
+                if (itemFile) {
+                  // Delete old image if it exists
+                  if (currentItems[itemIndex].image) {
+                    await deleteSupabaseImage(currentItems[itemIndex].image);
+                  }
+                  
+                  const fileName = generateFileName(
+                    `${id}_item_${itemId}`,
+                    itemFile.originalname,
+                    'item'
+                  );
+                  updatedItem.image = await uploadToSupabase(itemFile, fileName);
+                } else {
+                  // Keep existing image if no new image is uploaded
+                  updatedItem.image = currentItems[itemIndex].image;
                 }
-                
-                const fileName = generateFileName(
-                  `${id}_item_${itemId}`,
-                  itemFile.originalname,
-                  'item'
-                );
-                updatedItem.image = await uploadToSupabase(itemFile, fileName);
-              } else {
-                // Keep existing image if no new image is uploaded
-                updatedItem.image = currentItems[itemIndex].image;
+            
+                currentItems[itemIndex] = {
+                  _id: currentItems[itemIndex]._id,
+                  ...updatedItem,
+                };
               }
-
-              currentItems[itemIndex] = {
-                _id: currentItems[itemIndex]._id,
-                ...updatedItem,
-              };
-              console.log("hiii",currentItems[itemIndex])
-              currentItems.push(newItem);
-            }
-            break;
+              break;
 
           case "delete":
             const itemToDelete = currentItems.find(
@@ -242,7 +237,6 @@ export const updateCategory = async (req, res) => {
               message: "Invalid item operation",
             });
         }
-
         const updatedCategory = await Category.findByIdAndUpdate(
           id,
           { items: currentItems },
@@ -250,7 +244,6 @@ export const updateCategory = async (req, res) => {
         );
         return res.status(200).json({ success: true, data: updatedCategory });
       }
-
       // Handle category updates (name or image)
       const updateFields = {};
       if (name) {
@@ -267,10 +260,11 @@ export const updateCategory = async (req, res) => {
           const newImageUrl = await uploadToSupabase(categoryFile, fileName);
           updateFields.image = newImageUrl;
         } catch (error) {
-          return res.status(500).json({
+          res.status(500).json({
             success: false,
-            message: "Failed to process image",
+            message: "Failed to update category",
             error: error.message,
+            stack: error.stack // Remove in production
           });
         }
       }
